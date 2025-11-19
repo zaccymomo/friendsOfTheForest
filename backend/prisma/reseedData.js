@@ -35,6 +35,16 @@ async function clearDatabase() {
     await prisma.user.deleteMany({});
     console.log('✓ Cleared users');
 
+    // Reset auto-increment sequences
+    await prisma.$executeRawUnsafe('ALTER SEQUENCE "User_id_seq" RESTART WITH 1');
+    await prisma.$executeRawUnsafe('ALTER SEQUENCE "ForestFriend_id_seq" RESTART WITH 1');
+    await prisma.$executeRawUnsafe('ALTER SEQUENCE "ForestFriendBodyPart_id_seq" RESTART WITH 1');
+    await prisma.$executeRawUnsafe('ALTER SEQUENCE "Trail_id_seq" RESTART WITH 1');
+    await prisma.$executeRawUnsafe('ALTER SEQUENCE "TrailPhoto_id_seq" RESTART WITH 1');
+    await prisma.$executeRawUnsafe('ALTER SEQUENCE "Question_id_seq" RESTART WITH 1');
+    await prisma.$executeRawUnsafe('ALTER SEQUENCE "Option_id_seq" RESTART WITH 1');
+    console.log('✓ Reset auto-increment sequences');
+
     console.log('\n✅ Database cleared successfully!\n');
 }
 

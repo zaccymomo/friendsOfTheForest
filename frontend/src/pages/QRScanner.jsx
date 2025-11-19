@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { QrReader } from 'react-qr-reader';
 
@@ -8,6 +8,37 @@ export default function QRScanner() {
     const [error, setError] = useState('');
     const [isNavigating, setIsNavigating] = useState(false);
     const lastScannedRef = useRef(null);
+    const videoStreamRef = useRef(null);
+
+    // Cleanup function to stop the camera stream
+    const stopCamera = () => {
+        if (videoStreamRef.current) {
+            videoStreamRef.current.getTracks().forEach(track => {
+                track.stop();
+            });
+            videoStreamRef.current = null;
+        }
+    };
+
+    // Store video stream reference when component mounts
+    useEffect(() => {
+        // Try to get the video stream when it becomes available
+        const getVideoStream = () => {
+            const videoElement = document.querySelector('video');
+            if (videoElement && videoElement.srcObject) {
+                videoStreamRef.current = videoElement.srcObject;
+            }
+        };
+
+        // Check periodically until we find the video stream
+        const interval = setInterval(getVideoStream, 100);
+
+        // Cleanup on unmount
+        return () => {
+            clearInterval(interval);
+            stopCamera();
+        };
+    }, []);
 
     const handleResult = (result, error) => {
         if (result && scanning && !isNavigating) {
@@ -24,6 +55,8 @@ export default function QRScanner() {
                 const questionId = parseInt(scannedText, 10);
                 if (!isNaN(questionId) && questionId > 0) {
                     console.log('Navigating to question:', questionId);
+                    // Stop camera before navigating
+                    stopCamera();
                     // Use a small delay to ensure state updates
                     setTimeout(() => {
                         navigate(`/question/${questionId}`);
@@ -63,6 +96,7 @@ export default function QRScanner() {
     };
 
     const handleCancel = () => {
+        stopCamera();
         navigate(-1);
     };
 
