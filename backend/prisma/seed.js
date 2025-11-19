@@ -88,6 +88,7 @@ async function main() {
         data: {
             name: "Sally's Shell",
             rarity: 'RARE',
+            imageUrl: 'https://forestfriends.s3.ap-southeast-1.amazonaws.com/snail_shell.png',
             forestFriendId: snail.id,
         },
     });
@@ -96,6 +97,7 @@ async function main() {
         data: {
             name: "Sally's Antennae",
             rarity: 'LEGENDARY',
+            imageUrl: 'https://forestfriends.s3.ap-southeast-1.amazonaws.com/snail_antenna.png',
             forestFriendId: snail.id,
         },
     });
@@ -104,6 +106,7 @@ async function main() {
         data: {
             name: "Sally's Body",
             rarity: 'COMMON',
+            imageUrl: 'https://forestfriends.s3.ap-southeast-1.amazonaws.com/snail_body.png',
             forestFriendId: snail.id,
         },
     });

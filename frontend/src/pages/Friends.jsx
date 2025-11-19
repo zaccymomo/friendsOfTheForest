@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { getFriends } from '../api';
-import { getBodyPartStyle } from '../config/bodyPartPositions';
 
 export default function Friends({ refreshFriends }) {
     const [friendsData, setFriendsData] = useState(null);
@@ -34,84 +33,59 @@ export default function Friends({ refreshFriends }) {
         <div className="max-w-xl mx-auto p-4">
             {/* Header Section */}
             <div className="mb-6">
-                <p className="text-base font-normal text-black mb-4">Ready to Explore?</p>
+                <p className="text-xl font-normal text-black mb-4">Ready to Explore Sentosa?</p>
 
                 <div className="space-y-3">
                     <h1 className="text-base font-bold text-black">{username}'s Forest Friends Badges</h1>
                     <p className="text-xs font-normal text-black">
                         Embark on trails, help Forest Friends and collect their badges!
                     </p>
-                    <p className="text-xs font-bold text-black">
+                    <p className="text-L font-bold text-black">
                         {summary.completedFriends}/{summary.totalFriends} Friends Found
                     </p>
                 </div>
             </div>
 
             {/* Friends Grid */}
-            <div className="flex flex-row gap-3 items-center justify-start mb-4">
-                {friends.map(friend => {
-                    const foundBodyParts = friend.bodyParts.filter(bp => bp.found);
-                    const hasAnyParts = foundBodyParts.length > 0;
-
-                    return (
-                        <div key={friend.id} className="flex flex-col items-center gap-0.5 w-[126px]">
-                            {/* Friend Image - Progressive Reveal */}
-                            <div className="w-[110px] h-[90px] mb-1 relative bg-gray-100 rounded">
-                                {hasAnyParts ? (
-                                    // Show collected body parts as layered images
-                                    foundBodyParts.map(bodyPart => {
-                                        if (bodyPart.imageUrl) {
-                                            return (
-                                                <img
-                                                    key={bodyPart.id}
-                                                    src={bodyPart.imageUrl}
-                                                    alt={bodyPart.name}
-                                                    style={getBodyPartStyle(bodyPart.name)}
-                                                />
-                                            );
-                                        } else {
-                                            // Show alt text for body parts without images
-                                            return (
-                                                <div
-                                                    key={bodyPart.id}
-                                                    style={{
-                                                        ...getBodyPartStyle(bodyPart.name),
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        fontSize: '8px',
-                                                        color: '#666',
-                                                        backgroundColor: '#e5e7eb',
-                                                        border: '1px dashed #9ca3af',
-                                                        borderRadius: '4px',
-                                                        padding: '2px',
-                                                    }}
-                                                >
-                                                    {bodyPart.name}
-                                                </div>
-                                            );
-                                        }
-                                    })
-                                ) : (
-                                    // No parts found - show placeholder
-                                    <div className="w-full h-full flex items-center justify-center">
-                                        <span className="text-2xl font-bold text-gray-400">???</span>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Friend Name - Hidden if no parts found */}
-                            <p className="text-[8px] font-bold text-black text-center leading-none whitespace-pre">
-                                {hasAnyParts ? friend.name : '???'}
-                            </p>
-
-                            {/* Parts Found Status */}
-                            <p className="text-[8px] font-normal text-black text-center leading-none">
-                                {hasAnyParts ? `${friend.foundParts}/${friend.totalParts} Parts Found!` : '???'}
-                            </p>
+            <div className="grid grid-cols-2 gap-3 mb-4">
+                {friends.map(friend => (
+                    <div key={friend.id} className="flex flex-col items-center gap-1">
+                        {/* Friend Image */}
+                        <div className="w-[160px] h-[130px] mb-2">
+                            {friend.isCompleted && friend.imageUrl ? (
+                                // Show complete friend image when all parts are found
+                                <img
+                                    src={friend.imageUrl}
+                                    alt={friend.name}
+                                    className="w-full h-full object-cover bg-no-repeat"
+                                    style={{
+                                        backgroundSize: friend.name.includes('Hermit Crab') ? '124.89% 214.81%' :
+                                            friend.name.includes('Snail') ? '155.5% 166.3%' :
+                                                '220.76% 261.54%',
+                                        backgroundPosition: friend.name.includes('Hermit Crab') ? '40.82% 52.15%' :
+                                            friend.name.includes('Snail') ? '59.14% 51.71%' :
+                                                '51.69% 44.97%'
+                                    }}
+                                />
+                            ) : (
+                                // Show ??? for incomplete friends
+                                <div className="w-full h-full bg-gray-100 rounded flex items-center justify-center">
+                                    <span className="text-2xl font-bold text-gray-400">???</span>
+                                </div>
+                            )}
                         </div>
-                    );
-                })}
+
+                        {/* Friend Name */}
+                        <p className="text-xs font-bold text-black text-center leading-tight whitespace-pre">
+                            {friend.isCompleted ? friend.name : '???'}
+                        </p>
+
+                        {/* Parts Found Status */}
+                        <p className="text-xs font-normal text-black text-center leading-tight">
+                            {friend.foundParts}/{friend.totalParts} Parts Found{friend.isCompleted ? '!' : '!'}
+                        </p>
+                    </div>
+                ))}
             </div>
 
 
