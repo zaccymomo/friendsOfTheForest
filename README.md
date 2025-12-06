@@ -4,7 +4,35 @@ A gamified educational trail application where users explore nature trails, answ
 
 ## Quick Start
 
-For experienced developers, here's the TL;DR:
+### Option 1: Docker (Recommended)
+
+The easiest way to get started:
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd friendsOfTheForest
+
+# Create .env file with your NeonDB connection string
+cat > backend/.env << EOF
+DATABASE_URL="your-neondb-connection-string"
+JWT_SECRET="change-this-to-a-secure-random-string"
+EOF
+
+# Build and start containers (migrations run automatically)
+docker-compose up --build
+
+# In another terminal, seed the database (first time only)
+docker-compose exec backend npx prisma db seed
+# Or use the convenience script:
+./seed.sh
+```
+
+Then open `http://localhost:5173` and register an account!
+
+### Option 2: Manual Setup
+
+For experienced developers who prefer local development:
 
 ```bash
 # Clone and setup
@@ -55,7 +83,13 @@ Then open `http://localhost:5173` and register an account!
 
 ## Prerequisites
 
-Before you begin, ensure you have the following installed:
+### For Docker Setup (Recommended)
+- **[Git](https://git-scm.com/downloads)** - Version control system
+- **[Docker](https://www.docker.com/get-started)** - Containerization platform
+- **[Docker Compose](https://docs.docker.com/compose/install/)** - Multi-container orchestration (included with Docker Desktop)
+- **[NeonDB Account](https://neon.tech/)** - Serverless PostgreSQL database (free tier available)
+
+### For Manual Setup
 - **[Git](https://git-scm.com/downloads)** - Version control system
 - **[Node.js](https://nodejs.org/)** (v16 or higher) - JavaScript runtime
 - **npm** (comes with Node.js) - Package manager
@@ -96,6 +130,12 @@ npm --version
 
 ## Installation
 
+Choose either Docker setup (recommended) or Manual setup below.
+
+## Docker Setup (Recommended)
+
+Docker setup eliminates dependency management issues and ensures consistent environments across all machines.
+
 ### 1. Clone the Repository
 
 ```bash
@@ -106,13 +146,80 @@ git clone <repository-url>
 cd friendsOfTheForest
 ```
 
-If you don't have a repository URL yet, you can initialize a new Git repository:
+### 2. Set Up NeonDB Database
+
+1. **Create a NeonDB project:**
+   - Go to [neon.tech](https://neon.tech/) and sign in
+   - Click "Create Project"
+   - Choose a project name (e.g., "friends-of-forest")
+   - Select your preferred region
+   - Click "Create Project"
+
+2. **Get your connection string:**
+   - After creating the project, you'll see a connection string
+   - It will look like: `postgresql://[user]:[password]@[host]/[database]?sslmode=require`
+   - Copy this connection string - you'll need it in the next step
+   - You can always find it later in the project dashboard under "Connection Details"
+
+### 3. Configure Environment Variables
+
+Create a `.env` file in the `backend` directory:
 
 ```bash
-# Initialize Git (only if not cloning)
-git init
-git add .
-git commit -m "Initial commit"
+# Create .env file
+cat > backend/.env << EOF
+DATABASE_URL="your-neondb-connection-string-here"
+JWT_SECRET="change-this-to-a-secure-random-string"
+PORT=4000
+EOF
+```
+
+Or create it manually with your preferred text editor.
+
+### 4. Build and Start Docker Containers
+
+```bash
+# Build and start all services
+docker-compose up --build
+```
+
+This will:
+- Build Docker images for frontend and backend
+- Automatically run database migrations on startup
+- Start both services
+- The backend will be available on `http://localhost:4000`
+- The frontend will be available on `http://localhost:5173`
+
+**Note:** Database migrations are now run automatically when the backend container starts, so you don't need to run them manually!
+
+### 5. Seed the Database (First Time Only)
+
+In a new terminal window (keep docker-compose running):
+
+```bash
+# Seed the database with initial data
+docker-compose exec backend npx prisma db seed
+
+# Or use the convenience script
+./seed.sh
+```
+
+### 6. Access the Application
+
+Open your browser and navigate to `http://localhost:5173`
+
+## Manual Setup
+
+For developers who prefer to run services locally without Docker.
+
+### 1. Clone the Repository
+
+```bash
+# Clone the repository (replace <repository-url> with actual URL)
+git clone <repository-url>
+
+# Navigate into the project directory
+cd friendsOfTheForest
 ```
 
 ### 2. Set Up NeonDB Database
@@ -211,9 +318,31 @@ npm list --depth=0
 
 ## Running the Application
 
+### With Docker
+
+```bash
+# Start all services
+docker-compose up
+
+# Or run in detached mode (background)
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop all services
+docker-compose down
+```
+
+The application will be available at:
+- Frontend: `http://localhost:5173`
+- Backend API: `http://localhost:4000`
+
+### Manual Setup
+
 You'll need two terminal windows/tabs:
 
-### Terminal 1: Start Backend Server
+**Terminal 1: Start Backend Server**
 
 ```bash
 cd backend
@@ -222,7 +351,7 @@ node index.js
 
 The API server will start on `http://localhost:4000`
 
-### Terminal 2: Start Frontend Development Server
+**Terminal 2: Start Frontend Development Server**
 
 ```bash
 cd frontend
@@ -248,6 +377,12 @@ Open your browser and navigate to the URL shown in the terminal (typically `http
 
 View and edit your database with a GUI:
 
+**With Docker:**
+```bash
+docker-compose exec backend npx prisma studio
+```
+
+**Manual Setup:**
 ```bash
 cd backend
 npm exec prisma studio
@@ -284,8 +419,21 @@ The production-ready files will be in `frontend/dist/`
 
 ## Database Management
 
+### Automatic Migrations (Docker Only)
+
+When using Docker, database migrations run automatically every time the backend container starts. This means:
+- New migrations are applied automatically
+- The database schema stays in sync with your code
+- No manual migration commands needed for normal development
+
 ### Reset Database
 
+**With Docker:**
+```bash
+docker-compose exec backend npx prisma migrate reset
+```
+
+**Manual Setup:**
 ```bash
 cd backend
 npm exec prisma migrate reset
@@ -301,8 +449,33 @@ This will:
 
 After modifying `backend/prisma/schema.prisma`:
 
+**With Docker:**
+```bash
+# Create the migration file
+docker-compose exec backend npx prisma migrate dev --name description_of_changes
+
+# The migration will automatically run on next container restart
+docker-compose restart backend
+```
+
+**Manual Setup:**
 ```bash
 npm exec prisma migrate dev --name description_of_changes
+```
+
+### Seed Database
+
+**With Docker:**
+```bash
+docker-compose exec backend npx prisma db seed
+# Or use the convenience script:
+./seed.sh
+```
+
+**Manual Setup:**
+```bash
+cd backend
+npm exec prisma db seed
 ```
 
 ## Project Structure
@@ -322,6 +495,9 @@ friendsOfTheForest/
 │   │   └── profile.js            # User profile management
 │   ├── index.js                  # Express server entry point
 │   ├── generate-qr-codes.js      # QR code generation utility
+│   ├── docker-entrypoint.sh      # Docker entrypoint with auto migrations
+│   ├── Dockerfile                # Backend Docker configuration
+│   ├── .dockerignore             # Docker ignore rules
 │   ├── .env                      # Environment variables (not in git)
 │   ├── .gitignore                # Git ignore rules for backend
 │   └── package.json
@@ -347,8 +523,12 @@ friendsOfTheForest/
 │   │   └── main.jsx             # Application entry point
 │   ├── public/                   # Static assets
 │   ├── index.html
+│   ├── Dockerfile                # Frontend Docker configuration
+│   ├── .dockerignore             # Docker ignore rules
 │   ├── tailwind.config.js        # Tailwind CSS configuration
 │   └── package.json
+├── docker-compose.yml            # Docker orchestration configuration
+├── seed.sh                       # Convenience script for database seeding
 ├── .gitignore                    # Root git ignore rules
 └── README.md                     # This file
 ```
@@ -387,6 +567,54 @@ All endpoints except `/auth/*` require JWT authentication via `Authorization: Be
 | PORT | Server port | 4000 |
 
 ## Troubleshooting
+
+### Docker Issues
+
+**Container won't start:**
+```bash
+# Check container logs
+docker-compose logs backend
+docker-compose logs frontend
+
+# Rebuild containers from scratch
+docker-compose down
+docker-compose build --no-cache
+docker-compose up
+```
+
+**Port already in use:**
+```bash
+# Stop all containers
+docker-compose down
+
+# Check what's using the ports
+lsof -i :4000
+lsof -i :5173
+
+# Kill the process or change ports in docker-compose.yml
+```
+
+**Database migrations not working:**
+
+Migrations run automatically when the backend container starts. If you see migration errors:
+
+```bash
+# Check backend container logs
+docker-compose logs backend
+
+# Verify DATABASE_URL in backend/.env is correct
+cat backend/.env
+
+# If needed, run migrations manually
+docker-compose exec backend npx prisma migrate deploy
+
+# Reset database (WARNING: This deletes all data)
+docker-compose exec backend npx prisma migrate reset
+```
+
+**Hot reload not working:**
+- Ensure volumes are correctly mounted in docker-compose.yml
+- Try restarting the containers: `docker-compose restart`
 
 ### Database Connection Issues
 
