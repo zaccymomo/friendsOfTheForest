@@ -190,7 +190,7 @@ This will:
 - The backend will be available on `http://localhost:4000`
 - The frontend will be available on `http://localhost:5173`
 
-**Note:** Database migrations are now run automatically when the backend container starts, so you don't need to run them manually!
+**Note:** Database migrations run automatically when the backend container starts. If the database already has a schema (e.g., from a previous setup), it will be automatically reset to match the current migrations.
 
 ### 5. Seed the Database (First Time Only)
 
@@ -423,8 +423,11 @@ The production-ready files will be in `frontend/dist/`
 
 When using Docker, database migrations run automatically every time the backend container starts. This means:
 - New migrations are applied automatically
+- If an existing schema is detected, the database is reset and migrations are reapplied
 - The database schema stays in sync with your code
 - No manual migration commands needed for normal development
+
+**Note:** The automatic reset ensures a clean state matching your migrations, but will delete existing data.
 
 ### Reset Database
 
@@ -596,7 +599,7 @@ lsof -i :5173
 
 **Database migrations not working:**
 
-Migrations run automatically when the backend container starts. If you see migration errors:
+Migrations run automatically when the backend container starts. The entrypoint script will automatically reset the database if it detects an existing schema.
 
 ```bash
 # Check backend container logs
@@ -605,11 +608,9 @@ docker-compose logs backend
 # Verify DATABASE_URL in backend/.env is correct
 cat backend/.env
 
-# If needed, run migrations manually
-docker-compose exec backend npx prisma migrate deploy
-
-# Reset database (WARNING: This deletes all data)
-docker-compose exec backend npx prisma migrate reset
+# If migrations still fail, manually reset:
+docker-compose exec backend npx prisma migrate reset --force
+docker-compose restart backend
 ```
 
 **Hot reload not working:**
