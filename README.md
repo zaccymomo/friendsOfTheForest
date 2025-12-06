@@ -22,9 +22,7 @@ EOF
 # Build and start containers (migrations run automatically)
 docker-compose up --build
 
-# In another terminal, seed the database (first time only)
-docker-compose exec backend npx prisma db seed
-# Or use the convenience script:
+# In another terminal, seed the database
 ./seed.sh
 ```
 
@@ -192,16 +190,27 @@ This will:
 
 **Note:** Database migrations run automatically when the backend container starts. If the database already has a schema (e.g., from a previous setup), it will be automatically reset to match the current migrations.
 
-### 5. Seed the Database (First Time Only)
+### 5. Seed the Database
 
 In a new terminal window (keep docker-compose running):
 
 ```bash
-# Seed the database with initial data
+# Use the smart seed script (automatically detects if seeding or reseeding is needed)
+./seed.sh
+```
+
+The script will:
+- Check if the database has existing data
+- Run initial seed if database is empty
+- Run reseed (clear and seed) if data already exists
+
+**Manual seeding options:**
+```bash
+# First time seed only
 docker-compose exec backend npx prisma db seed
 
-# Or use the convenience script
-./seed.sh
+# Reseed (clear existing data and seed fresh)
+docker-compose exec backend npm run reseed
 ```
 
 ### 6. Access the Application
@@ -470,15 +479,26 @@ npm exec prisma migrate dev --name description_of_changes
 
 **With Docker:**
 ```bash
-docker-compose exec backend npx prisma db seed
-# Or use the convenience script:
+# Smart seed script (auto-detects if initial seed or reseed is needed)
 ./seed.sh
+
+# Manual options:
+# Initial seed (empty database)
+docker-compose exec backend npx prisma db seed
+
+# Reseed (clear and repopulate)
+docker-compose exec backend npm run reseed
 ```
 
 **Manual Setup:**
 ```bash
 cd backend
+
+# Initial seed
 npm exec prisma db seed
+
+# Reseed (clear and repopulate)
+npm run reseed
 ```
 
 ## Project Structure
