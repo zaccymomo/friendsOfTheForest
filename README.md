@@ -15,8 +15,8 @@ cd friendsOfTheForest
 cd backend
 npm install
 # Create .env with DATABASE_URL and JWT_SECRET
-npx prisma migrate dev
-npx prisma db seed
+npm exec prisma migrate dev
+npm exec prisma db seed
 node index.js &
 
 # Frontend setup (new terminal)
@@ -49,7 +49,7 @@ Then open `http://localhost:5173` and register an account!
 **Backend:**
 - Node.js with Express 5
 - Prisma ORM
-- PostgreSQL database
+- PostgreSQL database (NeonDB)
 - JWT authentication
 - bcrypt for password hashing
 
@@ -58,8 +58,8 @@ Then open `http://localhost:5173` and register an account!
 Before you begin, ensure you have the following installed:
 - **[Git](https://git-scm.com/downloads)** - Version control system
 - **[Node.js](https://nodejs.org/)** (v16 or higher) - JavaScript runtime
-- **[PostgreSQL](https://www.postgresql.org/)** (v12 or higher) - Database
 - **npm** (comes with Node.js) - Package manager
+- **[NeonDB Account](https://neon.tech/)** - Serverless PostgreSQL database (free tier available)
 
 ### Installing Dependencies
 
@@ -72,12 +72,9 @@ Before you begin, ensure you have the following installed:
 - Download and install from [nodejs.org](https://nodejs.org/) (LTS version recommended)
 - Or use a version manager like [nvm](https://github.com/nvm-sh/nvm)
 
-**PostgreSQL:**
-- **macOS**:
-  - With Homebrew: `brew install postgresql@15` then `brew services start postgresql@15`
-  - Or download [Postgres.app](https://postgresapp.com/)
-- **Windows**: Download installer from [postgresql.org](https://www.postgresql.org/download/windows/)
-- **Linux**: `sudo apt-get install postgresql postgresql-contrib` (Ubuntu/Debian)
+**NeonDB:**
+- Sign up for a free account at [neon.tech](https://neon.tech/)
+- No local installation required - NeonDB is a serverless PostgreSQL database
 
 ### Verifying Prerequisites
 
@@ -95,18 +92,6 @@ node --version
 # Check npm installation
 npm --version
 # Expected output: 9.x.x or higher
-
-# Check PostgreSQL installation
-psql --version
-# Expected output: psql (PostgreSQL) 12.x or higher
-
-# Check if PostgreSQL is running (macOS/Linux)
-pg_isready
-# Expected output: /tmp:5432 - accepting connections
-
-# Or check status (macOS with Homebrew)
-brew services list | grep postgresql
-# Expected output: postgresql@15 started
 ```
 
 ## Installation
@@ -130,27 +115,20 @@ git add .
 git commit -m "Initial commit"
 ```
 
-### 2. Create PostgreSQL Database
+### 2. Set Up NeonDB Database
 
-Before setting up the backend, create the database:
+1. **Create a NeonDB project:**
+   - Go to [neon.tech](https://neon.tech/) and sign in
+   - Click "Create Project"
+   - Choose a project name (e.g., "friends-of-forest")
+   - Select your preferred region
+   - Click "Create Project"
 
-```bash
-# Connect to PostgreSQL (macOS/Linux)
-psql postgres
-
-# Or on Windows, use pgAdmin or:
-psql -U postgres
-
-# In the PostgreSQL prompt, create the database:
-CREATE DATABASE friends_of_forest;
-
-# Create a user (optional, if you want a dedicated user)
-CREATE USER forest_user WITH PASSWORD 'your_password';
-GRANT ALL PRIVILEGES ON DATABASE friends_of_forest TO forest_user;
-
-# Exit PostgreSQL
-\q
-```
+2. **Get your connection string:**
+   - After creating the project, you'll see a connection string
+   - It will look like: `postgresql://[user]:[password]@[host]/[database]?sslmode=require`
+   - Copy this connection string - you'll need it in the next step
+   - You can always find it later in the project dashboard under "Connection Details"
 
 ### 3. Backend Setup
 
@@ -167,15 +145,12 @@ cp .env.example .env
 
 **Configure your database connection:**
 
-Create or edit `backend/.env` with your PostgreSQL credentials:
+Create or edit `backend/.env` with your NeonDB connection string:
 
 ```env
-# Database connection string
-# Format: postgresql://USERNAME:PASSWORD@HOST:PORT/DATABASE_NAME
-DATABASE_URL="postgresql://postgres:your_password@localhost:5432/friends_of_forest"
-
-# Or if you created a dedicated user:
-# DATABASE_URL="postgresql://forest_user:your_password@localhost:5432/friends_of_forest"
+# Database connection string from NeonDB
+# Paste the full connection string you copied from NeonDB
+DATABASE_URL="postgresql://[user]:[password]@[host]/[database]?sslmode=require"
 
 # JWT secret for authentication (change this to a random string)
 JWT_SECRET="change-this-to-a-secure-random-string-for-production"
@@ -185,22 +160,25 @@ PORT=4000
 ```
 
 **Important Notes:**
-- Replace `your_password` with your actual PostgreSQL password
+- Replace the entire `DATABASE_URL` value with your NeonDB connection string
+- Keep `?sslmode=require` at the end of the connection string (required for NeonDB)
 - For production, use a strong, unique JWT_SECRET
-- The default PostgreSQL user is usually `postgres`
+- Never commit your `.env` file to version control
 
 **Run database migrations:**
 
 ```bash
 # Create database tables
-npx prisma migrate dev
+npm exec prisma migrate dev
 
 # Generate Prisma Client
-npx prisma generate
+npm exec prisma generate
 
 # Seed the database with initial data (trails, questions, forest friends)
-npx prisma db seed
+npm exec prisma db seed
 ```
+
+**Note:** Use `npm exec prisma` instead of `npx prisma` to ensure you're using the project's local Prisma version (6.x), not a globally installed version (which may be Prisma 7.x with breaking changes).
 
 ### 4. Frontend Setup
 
@@ -272,7 +250,7 @@ View and edit your database with a GUI:
 
 ```bash
 cd backend
-npx prisma studio
+npm exec prisma studio
 ```
 
 This opens a browser interface at `http://localhost:5555`
@@ -310,7 +288,7 @@ The production-ready files will be in `frontend/dist/`
 
 ```bash
 cd backend
-npx prisma migrate reset
+npm exec prisma migrate reset
 ```
 
 This will:
@@ -324,7 +302,7 @@ This will:
 After modifying `backend/prisma/schema.prisma`:
 
 ```bash
-npx prisma migrate dev --name description_of_changes
+npm exec prisma migrate dev --name description_of_changes
 ```
 
 ## Project Structure
@@ -404,7 +382,7 @@ All endpoints except `/auth/*` require JWT authentication via `Authorization: Be
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| DATABASE_URL | PostgreSQL connection string | - |
+| DATABASE_URL | NeonDB PostgreSQL connection string (must include `?sslmode=require`) | - |
 | JWT_SECRET | Secret key for signing JWT tokens | devsecret |
 | PORT | Server port | 4000 |
 
@@ -412,9 +390,11 @@ All endpoints except `/auth/*` require JWT authentication via `Authorization: Be
 
 ### Database Connection Issues
 
-- Ensure PostgreSQL is running: `pg_isready`
-- Verify credentials in `backend/.env`
-- Check if database exists: `psql -l`
+- Verify your NeonDB connection string in `backend/.env` is correct
+- Ensure the connection string includes `?sslmode=require` at the end
+- Check that your NeonDB project is active (not suspended due to inactivity on free tier)
+- Verify network connectivity - NeonDB requires internet access
+- Check the NeonDB dashboard for any service status issues
 
 ### Port Already in Use
 
@@ -428,8 +408,16 @@ If you see "Prisma Client not generated" errors:
 
 ```bash
 cd backend
-npx prisma generate
+npm exec prisma generate
 ```
+
+### Prisma Version Mismatch
+
+If you see errors about "`url` is no longer supported in schema files" or other Prisma 7 errors:
+
+- This means you have Prisma 7.x installed globally but the project uses Prisma 6.x
+- **Solution:** Always use `npm exec prisma` instead of `npx prisma` to use the project's local version
+- Alternatively, uninstall the global Prisma: `npm uninstall -g prisma`
 
 ### QR Scanner Not Working
 

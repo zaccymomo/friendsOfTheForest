@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:4000'; // Change if backend runs elsewhere
+// Use localhost for desktop, or your computer's IP for phone access
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 let token = null;
 
 export function setToken(t) {
