@@ -616,6 +616,11 @@ docker-compose exec backend npx prisma migrate reset
 - Ensure volumes are correctly mounted in docker-compose.yml
 - Try restarting the containers: `docker-compose restart`
 
+**npm peer dependency errors:**
+- The project uses `--legacy-peer-deps` for `react-qr-reader` compatibility with React 18
+- This is already configured in the Dockerfiles
+- If you see peer dependency errors, rebuild with: `docker-compose build --no-cache`
+
 ### Database Connection Issues
 
 - Verify your NeonDB connection string in `backend/.env` is correct
