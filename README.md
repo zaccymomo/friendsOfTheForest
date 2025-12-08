@@ -403,6 +403,12 @@ This opens a browser interface at `http://localhost:5555`
 
 To generate QR codes for questions:
 
+**With Docker:**
+```bash
+docker-compose exec backend node generate-qr-codes.js
+```
+
+**Manual Setup:**
 ```bash
 cd backend
 node generate-qr-codes.js

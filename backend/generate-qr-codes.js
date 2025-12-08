@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 
 async function generateQRCodeData() {
     try {
-        // Get all questions
+        // Get all questions with options
         const questions = await prisma.question.findMany({
             include: {
                 trail: true,
@@ -11,7 +11,8 @@ async function generateQRCodeData() {
                     include: {
                         forestFriend: true
                     }
-                }
+                },
+                options: true
             }
         });
 
@@ -22,6 +23,24 @@ async function generateQRCodeData() {
             console.log(`Trail: ${question.trail.name}`);
             console.log(`For: ${question.bodyPart?.forestFriend?.name || 'Unknown'} - ${question.bodyPart?.name || 'Unknown'}`);
             console.log(`Question: ${question.question}`);
+            console.log(`Type: ${question.type}`);
+
+            // Display answers
+            if (question.options && question.options.length > 0) {
+                const correctAnswers = question.options.filter(opt => opt.correct);
+                console.log(`Correct Answer(s):`);
+                correctAnswers.forEach(answer => {
+                    console.log(`  - ${answer.description}`);
+                });
+
+                if (question.type === 'MCQ') {
+                    console.log(`All Options:`);
+                    question.options.forEach((opt, idx) => {
+                        console.log(`  ${idx + 1}. ${opt.description} ${opt.correct ? '✓' : ''}`);
+                    });
+                }
+            }
+
             console.log(`QR Code Content: ${question.id}`);
             console.log(`QR Code URL: https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${question.id}`);
             console.log('---\n');
