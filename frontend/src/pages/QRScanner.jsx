@@ -9,19 +9,37 @@ export default function QRScanner() {
     const [isNavigating, setIsNavigating] = useState(false);
     const lastScannedRef = useRef(null);
     const videoStreamRef = useRef(null);
+    const qrReaderMountedRef = useRef(true);
 
     // Cleanup function to stop the camera stream
     const stopCamera = () => {
+        // Try multiple methods to ensure camera stops on Safari iOS
+
+        // Method 1: Stop tracks from our stored reference
         if (videoStreamRef.current) {
             videoStreamRef.current.getTracks().forEach(track => {
                 track.stop();
             });
             videoStreamRef.current = null;
         }
+
+        // Method 2: Find and stop all video elements on the page
+        const videoElements = document.querySelectorAll('video');
+        videoElements.forEach(video => {
+            if (video.srcObject) {
+                const stream = video.srcObject;
+                stream.getTracks().forEach(track => {
+                    track.stop();
+                });
+                video.srcObject = null;
+            }
+        });
     };
 
     // Store video stream reference when component mounts
     useEffect(() => {
+        qrReaderMountedRef.current = true;
+
         // Try to get the video stream when it becomes available
         const getVideoStream = () => {
             const videoElement = document.querySelector('video');
@@ -36,39 +54,59 @@ export default function QRScanner() {
         // Cleanup on unmount
         return () => {
             clearInterval(interval);
+            qrReaderMountedRef.current = false;
             stopCamera();
         };
     }, []);
 
+    // Stop camera when scanning is disabled (critical for Safari iOS)
+    useEffect(() => {
+        if (!scanning) {
+            // Give a brief moment for state to update, then stop camera
+            const timer = setTimeout(() => {
+                stopCamera();
+            }, 50);
+            return () => clearTimeout(timer);
+        }
+    }, [scanning]);
+
     const handleResult = (result, error) => {
-        if (result && scanning && !isNavigating) {
+        if (result && scanning && !isNavigating && qrReaderMountedRef.current) {
             const scannedText = result?.text;
 
             // Prevent duplicate scans of the same content
             if (scannedText && scannedText !== lastScannedRef.current) {
                 console.log('QR Code scanned:', scannedText);
                 lastScannedRef.current = scannedText;
-                setScanning(false); // Stop scanning immediately
-                setIsNavigating(true); // Prevent any further processing
 
                 // Check if the scanned text is a valid question ID (number)
                 const questionId = parseInt(scannedText, 10);
                 if (!isNaN(questionId) && questionId > 0) {
                     console.log('Navigating to question:', questionId);
-                    // Stop camera before navigating
+
+                    // Immediately stop scanning and mark as navigating
+                    setScanning(false);
+                    setIsNavigating(true);
+
+                    // Stop camera immediately - critical for Safari iOS
                     stopCamera();
-                    // Use a small delay to ensure state updates
+
+                    // Navigate after ensuring camera is stopped
                     setTimeout(() => {
-                        navigate(`/question/${questionId}`);
-                    }, 100);
+                        if (qrReaderMountedRef.current) {
+                            navigate(`/question/${questionId}`);
+                        }
+                    }, 150);
                 } else {
                     // Handle non-question QR codes
+                    setScanning(false);
                     setError(`Invalid QR code: "${scannedText}". Please scan a question QR code.`);
-                    setIsNavigating(false);
                     setTimeout(() => {
-                        setError('');
-                        setScanning(true);
-                        lastScannedRef.current = null;
+                        if (qrReaderMountedRef.current) {
+                            setError('');
+                            setScanning(true);
+                            lastScannedRef.current = null;
+                        }
                     }, 3000);
                 }
             }

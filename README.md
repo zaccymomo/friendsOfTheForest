@@ -4,9 +4,48 @@ A gamified educational trail application where users explore nature trails, answ
 
 ## Quick Start
 
-### Option 1: Docker (Recommended)
+### Option 1: Docker + Tunnelmole (Recommended for Mobile Access)
 
-The easiest way to get started:
+The easiest way to get started with mobile phone access:
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd friendsOfTheForest
+
+# Create .env file with your NeonDB connection string
+cat > backend/.env << EOF
+DATABASE_URL="your-neondb-connection-string"
+JWT_SECRET="change-this-to-a-secure-random-string"
+EOF
+
+# Build and start containers (migrations run automatically)
+docker-compose up --build -d
+
+# In another terminal, seed the database
+./seed.sh
+
+# Install tunnelmole globally (for HTTPS access on mobile)
+npm install -g tunnelmole
+
+# Start tunnelmole for backend (in a new terminal)
+tmole 4000
+
+# Start tunnelmole for frontend (in another new terminal)
+tmole 5173
+
+# Copy the backend HTTPS URL and update frontend/.env
+echo "VITE_API_URL=https://[backend-tunnelmole-url]" > frontend/.env
+
+# Restart frontend to apply changes
+docker-compose restart frontend
+```
+
+Then open the frontend tunnelmole HTTPS URL on your phone or computer!
+
+### Option 2: Docker (Local Development Only)
+
+For local development without mobile access:
 
 ```bash
 # Clone the repository
@@ -28,7 +67,7 @@ docker-compose up --build
 
 Then open `http://localhost:5173` and register an account!
 
-### Option 2: Manual Setup
+### Option 3: Manual Setup
 
 For experienced developers who prefer local development:
 
@@ -52,6 +91,57 @@ npm run dev
 ```
 
 Then open `http://localhost:5173` and register an account!
+
+## Mobile Access with Tunnelmole
+
+To access the app from your mobile phone with full QR scanner functionality, use Tunnelmole to create secure HTTPS tunnels:
+
+### Why Tunnelmole?
+
+- **HTTPS Required**: Mobile browsers require HTTPS to access the camera for QR scanning
+- **No Warning Pages**: Unlike ngrok's free tier, tunnelmole has no interstitial warning pages
+- **Free**: Completely free with no account required
+- **Internet-wide Access**: Share your app URL with anyone, anywhere
+
+### Setup Steps
+
+1. **Start Docker containers** (if not already running):
+   ```bash
+   docker-compose up -d
+   ```
+
+2. **Install tunnelmole** globally:
+   ```bash
+   npm install -g tunnelmole
+   ```
+
+3. **Start tunnelmole for backend** (in a new terminal):
+   ```bash
+   tmole 4000
+   ```
+   Copy the HTTPS URL (e.g., `https://abc123-ip-xxx-xxx-xxx-xxx.tunnelmole.net`)
+
+4. **Start tunnelmole for frontend** (in another terminal):
+   ```bash
+   tmole 5173
+   ```
+   Copy the HTTPS URL (e.g., `https://def456-ip-xxx-xxx-xxx-xxx.tunnelmole.net`)
+
+5. **Update frontend configuration**:
+   ```bash
+   echo "VITE_API_URL=https://[backend-tunnelmole-url]" > frontend/.env
+   docker-compose restart frontend
+   ```
+
+6. **Access from any device**:
+   - Open the frontend tunnelmole URL on your phone's browser
+   - The QR scanner will work because you're using HTTPS!
+
+### Important Notes
+
+- **Keep terminals open**: Tunnelmole needs to stay running in both terminal windows
+- **URLs change on restart**: If you restart tunnelmole, update `frontend/.env` with the new backend URL
+- **Vite configuration**: The `vite.config.js` is already configured to accept tunnelmole hosts
 
 ## Features
 
