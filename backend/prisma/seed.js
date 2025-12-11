@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
+const { forestFriendAssets, trailAssets } = require('../config/s3Assets');
 const prisma = new PrismaClient();
 
 async function main() {
@@ -29,148 +30,355 @@ async function main() {
     console.log('✓ Ensured user exists: test\n');
 
     // Create forest friends (check if exist first)
-    let hermitCrab = await prisma.forestFriend.findFirst({
-        where: { name: 'Corey the Hermit Crab' }
+    let spider = await prisma.forestFriend.findFirst({
+        where: { name: 'Spider' }
     });
-    if (!hermitCrab) {
-        hermitCrab = await prisma.forestFriend.create({
+    if (!spider) {
+        spider = await prisma.forestFriend.create({
             data: {
-                name: 'Corey the Hermit Crab',
-                imageUrl: 'https://forestfriends.s3.ap-southeast-1.amazonaws.com/hermit.png'
+                name: 'Spider',
+                imageUrl: forestFriendAssets.spider.outline
             },
         });
-        console.log('✓ Created forest friend: Corey the Hermit Crab');
+        console.log('✓ Created forest friend: Spider');
     } else {
-        console.log('✓ Forest friend already exists: Corey the Hermit Crab');
+        console.log('✓ Forest friend already exists: Spider');
+    }
+
+    let otter = await prisma.forestFriend.findFirst({
+        where: { name: 'Otter' }
+    });
+    if (!otter) {
+        otter = await prisma.forestFriend.create({
+            data: {
+                name: 'Otter',
+                imageUrl: forestFriendAssets.otter.outline
+            },
+        });
+        console.log('✓ Created forest friend: Otter');
+    } else {
+        console.log('✓ Forest friend already exists: Otter');
+    }
+
+    let lizard = await prisma.forestFriend.findFirst({
+        where: { name: 'Lizard' }
+    });
+    if (!lizard) {
+        lizard = await prisma.forestFriend.create({
+            data: {
+                name: 'Lizard',
+                imageUrl: forestFriendAssets.lizard.outline
+            },
+        });
+        console.log('✓ Created forest friend: Lizard');
+    } else {
+        console.log('✓ Forest friend already exists: Lizard');
+    }
+
+    let lion = await prisma.forestFriend.findFirst({
+        where: { name: 'Lion' }
+    });
+    if (!lion) {
+        lion = await prisma.forestFriend.create({
+            data: {
+                name: 'Lion',
+                imageUrl: forestFriendAssets.lion.outline
+            },
+        });
+        console.log('✓ Created forest friend: Lion');
+    } else {
+        console.log('✓ Forest friend already exists: Lion');
     }
 
     let koel = await prisma.forestFriend.findFirst({
-        where: { name: 'Kingston the Koel' }
+        where: { name: 'Koel' }
     });
     if (!koel) {
         koel = await prisma.forestFriend.create({
             data: {
-                name: 'Kingston the Koel',
-                imageUrl: 'https://forestfriends.s3.ap-southeast-1.amazonaws.com/koel.png'
+                name: 'Koel',
+                imageUrl: forestFriendAssets.koel.outline
             },
         });
-        console.log('✓ Created forest friend: Kingston the Koel');
+        console.log('✓ Created forest friend: Koel');
     } else {
-        console.log('✓ Forest friend already exists: Kingston the Koel');
+        console.log('✓ Forest friend already exists: Koel');
     }
 
-    let snail = await prisma.forestFriend.findFirst({
-        where: { name: 'Sally the Snail' }
+    let beetle = await prisma.forestFriend.findFirst({
+        where: { name: 'Beetle' }
     });
-    if (!snail) {
-        snail = await prisma.forestFriend.create({
+    if (!beetle) {
+        beetle = await prisma.forestFriend.create({
             data: {
-                name: 'Sally the Snail',
-                imageUrl: 'https://forestfriends.s3.ap-southeast-1.amazonaws.com/snail.png'
+                name: 'Beetle',
+                imageUrl: forestFriendAssets.beetle.outline
             },
         });
-        console.log('✓ Created forest friend: Sally the Snail\n');
+        console.log('✓ Created forest friend: Beetle\n');
     } else {
-        console.log('✓ Forest friend already exists: Sally the Snail\n');
+        console.log('✓ Forest friend already exists: Beetle\n');
     }
 
     // Create body parts (check if exist first)
-    let coreyClaw = await prisma.forestFriendBodyPart.findFirst({
-        where: { name: "Corey's Claw" }
+    // Spider body parts
+    let spiderLegs = await prisma.forestFriendBodyPart.findFirst({
+        where: { name: "Spider Legs" }
     });
-    if (!coreyClaw) {
-        coreyClaw = await prisma.forestFriendBodyPart.create({
+    if (!spiderLegs) {
+        spiderLegs = await prisma.forestFriendBodyPart.create({
             data: {
-                name: "Corey's Claw",
+                name: "Spider Legs",
                 rarity: 'COMMON',
-                forestFriendId: hermitCrab.id,
+                imageUrl: forestFriendAssets.spider.legs,
+                forestFriendId: spider.id,
             },
         });
     }
 
-    let coreyShell = await prisma.forestFriendBodyPart.findFirst({
-        where: { name: "Corey's Shell" }
+    let spiderHead = await prisma.forestFriendBodyPart.findFirst({
+        where: { name: "Spider Head" }
     });
-    if (!coreyShell) {
-        coreyShell = await prisma.forestFriendBodyPart.create({
+    if (!spiderHead) {
+        spiderHead = await prisma.forestFriendBodyPart.create({
             data: {
-                name: "Corey's Shell",
+                name: "Spider Head",
                 rarity: 'RARE',
-                forestFriendId: hermitCrab.id,
+                imageUrl: forestFriendAssets.spider.head,
+                forestFriendId: spider.id,
             },
         });
     }
 
-    let kingstonFeet = await prisma.forestFriendBodyPart.findFirst({
-        where: { name: "Kingston's Feet" }
+    let spiderBody = await prisma.forestFriendBodyPart.findFirst({
+        where: { name: "Spider Body" }
     });
-    if (!kingstonFeet) {
-        kingstonFeet = await prisma.forestFriendBodyPart.create({
+    if (!spiderBody) {
+        spiderBody = await prisma.forestFriendBodyPart.create({
             data: {
-                name: "Kingston's Feet",
+                name: "Spider Body",
                 rarity: 'COMMON',
-                imageUrl: 'https://forestfriends.s3.ap-southeast-1.amazonaws.com/koel_feet.png',
-                forestFriendId: koel.id,
+                imageUrl: forestFriendAssets.spider.body,
+                forestFriendId: spider.id,
             },
         });
     }
 
-    let kingstonBody = await prisma.forestFriendBodyPart.findFirst({
-        where: { name: "Kingston's Body" }
+    // Otter body parts
+    let otterTail = await prisma.forestFriendBodyPart.findFirst({
+        where: { name: "Otter Tail" }
     });
-    if (!kingstonBody) {
-        kingstonBody = await prisma.forestFriendBodyPart.create({
+    if (!otterTail) {
+        otterTail = await prisma.forestFriendBodyPart.create({
             data: {
-                name: "Kingston's Body",
+                name: "Otter Tail",
                 rarity: 'COMMON',
-                imageUrl: 'https://forestfriends.s3.ap-southeast-1.amazonaws.com/koel_body.png',
-                forestFriendId: koel.id,
+                imageUrl: forestFriendAssets.otter.tail,
+                forestFriendId: otter.id,
             },
         });
     }
 
-    let sallyShell = await prisma.forestFriendBodyPart.findFirst({
-        where: { name: "Sally's Shell" }
+    let otterHead = await prisma.forestFriendBodyPart.findFirst({
+        where: { name: "Otter Head" }
     });
-    if (!sallyShell) {
-        sallyShell = await prisma.forestFriendBodyPart.create({
+    if (!otterHead) {
+        otterHead = await prisma.forestFriendBodyPart.create({
             data: {
-                name: "Sally's Shell",
+                name: "Otter Head",
                 rarity: 'RARE',
-                imageUrl: 'https://forestfriends.s3.ap-southeast-1.amazonaws.com/snail_shell.png',
-                forestFriendId: snail.id,
+                imageUrl: forestFriendAssets.otter.head,
+                forestFriendId: otter.id,
             },
         });
     }
 
-    let sallyAntennae = await prisma.forestFriendBodyPart.findFirst({
-        where: { name: "Sally's Antennae" }
+    let otterBody = await prisma.forestFriendBodyPart.findFirst({
+        where: { name: "Otter Body" }
     });
-    if (!sallyAntennae) {
-        sallyAntennae = await prisma.forestFriendBodyPart.create({
+    if (!otterBody) {
+        otterBody = await prisma.forestFriendBodyPart.create({
             data: {
-                name: "Sally's Antennae",
+                name: "Otter Body",
+                rarity: 'COMMON',
+                imageUrl: forestFriendAssets.otter.body,
+                forestFriendId: otter.id,
+            },
+        });
+    }
+
+    // Lizard body parts
+    let lizardTail = await prisma.forestFriendBodyPart.findFirst({
+        where: { name: "Lizard Tail" }
+    });
+    if (!lizardTail) {
+        lizardTail = await prisma.forestFriendBodyPart.create({
+            data: {
+                name: "Lizard Tail",
+                rarity: 'COMMON',
+                imageUrl: forestFriendAssets.lizard.tail,
+                forestFriendId: lizard.id,
+            },
+        });
+    }
+
+    let lizardHead = await prisma.forestFriendBodyPart.findFirst({
+        where: { name: "Lizard Head" }
+    });
+    if (!lizardHead) {
+        lizardHead = await prisma.forestFriendBodyPart.create({
+            data: {
+                name: "Lizard Head",
+                rarity: 'RARE',
+                imageUrl: forestFriendAssets.lizard.head,
+                forestFriendId: lizard.id,
+            },
+        });
+    }
+
+    let lizardBody = await prisma.forestFriendBodyPart.findFirst({
+        where: { name: "Lizard Body" }
+    });
+    if (!lizardBody) {
+        lizardBody = await prisma.forestFriendBodyPart.create({
+            data: {
+                name: "Lizard Body",
+                rarity: 'COMMON',
+                imageUrl: forestFriendAssets.lizard.body,
+                forestFriendId: lizard.id,
+            },
+        });
+    }
+
+    // Lion body parts
+    let lionTail = await prisma.forestFriendBodyPart.findFirst({
+        where: { name: "Lion Tail" }
+    });
+    if (!lionTail) {
+        lionTail = await prisma.forestFriendBodyPart.create({
+            data: {
+                name: "Lion Tail",
+                rarity: 'COMMON',
+                imageUrl: forestFriendAssets.lion.tail,
+                forestFriendId: lion.id,
+            },
+        });
+    }
+
+    let lionHead = await prisma.forestFriendBodyPart.findFirst({
+        where: { name: "Lion Head" }
+    });
+    if (!lionHead) {
+        lionHead = await prisma.forestFriendBodyPart.create({
+            data: {
+                name: "Lion Head",
                 rarity: 'LEGENDARY',
-                imageUrl: 'https://forestfriends.s3.ap-southeast-1.amazonaws.com/snail_antenna.png',
-                forestFriendId: snail.id,
+                imageUrl: forestFriendAssets.lion.head,
+                forestFriendId: lion.id,
             },
         });
     }
 
-    let sallyBody = await prisma.forestFriendBodyPart.findFirst({
-        where: { name: "Sally's Body" }
+    let lionBody = await prisma.forestFriendBodyPart.findFirst({
+        where: { name: "Lion Body" }
     });
-    if (!sallyBody) {
-        sallyBody = await prisma.forestFriendBodyPart.create({
+    if (!lionBody) {
+        lionBody = await prisma.forestFriendBodyPart.create({
             data: {
-                name: "Sally's Body",
-                rarity: 'COMMON',
-                imageUrl: 'https://forestfriends.s3.ap-southeast-1.amazonaws.com/snail_body.png',
-                forestFriendId: snail.id,
+                name: "Lion Body",
+                rarity: 'RARE',
+                imageUrl: forestFriendAssets.lion.body,
+                forestFriendId: lion.id,
             },
         });
     }
-    console.log('✓ Ensured 7 body parts exist\n');
+
+    // Koel body parts
+    let koelTail = await prisma.forestFriendBodyPart.findFirst({
+        where: { name: "Koel Tail" }
+    });
+    if (!koelTail) {
+        koelTail = await prisma.forestFriendBodyPart.create({
+            data: {
+                name: "Koel Tail",
+                rarity: 'COMMON',
+                imageUrl: forestFriendAssets.koel.tail,
+                forestFriendId: koel.id,
+            },
+        });
+    }
+
+    let koelHeadBody = await prisma.forestFriendBodyPart.findFirst({
+        where: { name: "Koel Head & Body" }
+    });
+    if (!koelHeadBody) {
+        koelHeadBody = await prisma.forestFriendBodyPart.create({
+            data: {
+                name: "Koel Head & Body",
+                rarity: 'RARE',
+                imageUrl: forestFriendAssets.koel.headBody,
+                forestFriendId: koel.id,
+            },
+        });
+    }
+
+    let koelClaws = await prisma.forestFriendBodyPart.findFirst({
+        where: { name: "Koel Claws" }
+    });
+    if (!koelClaws) {
+        koelClaws = await prisma.forestFriendBodyPart.create({
+            data: {
+                name: "Koel Claws",
+                rarity: 'COMMON',
+                imageUrl: forestFriendAssets.koel.claws,
+                forestFriendId: koel.id,
+            },
+        });
+    }
+
+    // Beetle body parts
+    let beetleHead = await prisma.forestFriendBodyPart.findFirst({
+        where: { name: "Beetle Head" }
+    });
+    if (!beetleHead) {
+        beetleHead = await prisma.forestFriendBodyPart.create({
+            data: {
+                name: "Beetle Head",
+                rarity: 'COMMON',
+                imageUrl: forestFriendAssets.beetle.head,
+                forestFriendId: beetle.id,
+            },
+        });
+    }
+
+    let beetleBody = await prisma.forestFriendBodyPart.findFirst({
+        where: { name: "Beetle Body" }
+    });
+    if (!beetleBody) {
+        beetleBody = await prisma.forestFriendBodyPart.create({
+            data: {
+                name: "Beetle Body",
+                rarity: 'RARE',
+                imageUrl: forestFriendAssets.beetle.body,
+                forestFriendId: beetle.id,
+            },
+        });
+    }
+
+    let beetleAntenna = await prisma.forestFriendBodyPart.findFirst({
+        where: { name: "Beetle Antenna" }
+    });
+    if (!beetleAntenna) {
+        beetleAntenna = await prisma.forestFriendBodyPart.create({
+            data: {
+                name: "Beetle Antenna",
+                rarity: 'LEGENDARY',
+                imageUrl: forestFriendAssets.beetle.antenna,
+                forestFriendId: beetle.id,
+            },
+        });
+    }
+    console.log('✓ Ensured 18 body parts exist\n');
 
     // Create trails (check if exist first)
     let coastalTrail = await prisma.trail.findFirst({
@@ -180,7 +388,7 @@ async function main() {
         coastalTrail = await prisma.trail.create({
             data: {
                 name: 'Sentosa Coastal Trail',
-                mapUrl: 'https://forestfriends.s3.ap-southeast-1.amazonaws.com/photo_2025-11-20+00.57.10.jpeg',
+                mapUrl: trailAssets.coastalTrailMap,
                 description: 'A scenic trail along the coast of Sentosa with beautiful ocean views.',
             },
         });
@@ -241,14 +449,26 @@ async function main() {
     if (existingTrailBodyParts === 0) {
         await prisma.trailBodyPart.createMany({
             data: [
-                // Sentosa Coastal Trail: Kingston (2 parts) + Sally (2 parts)
-                { trailId: coastalTrail.id, bodyPartId: kingstonFeet.id },
-                { trailId: coastalTrail.id, bodyPartId: kingstonBody.id },
-                { trailId: coastalTrail.id, bodyPartId: sallyShell.id },
-                { trailId: coastalTrail.id, bodyPartId: sallyBody.id },
-                // Sentosa Imbiah Trail: Sally (1 remaining part) + Corey (1 part)
-                { trailId: imbiahTrail.id, bodyPartId: sallyAntennae.id },
-                { trailId: imbiahTrail.id, bodyPartId: coreyClaw.id },
+                // Sentosa Coastal Trail: Spider (3 parts) + Otter (3 parts) + Lizard (3 parts)
+                { trailId: coastalTrail.id, bodyPartId: spiderLegs.id },
+                { trailId: coastalTrail.id, bodyPartId: spiderHead.id },
+                { trailId: coastalTrail.id, bodyPartId: spiderBody.id },
+                { trailId: coastalTrail.id, bodyPartId: otterTail.id },
+                { trailId: coastalTrail.id, bodyPartId: otterHead.id },
+                { trailId: coastalTrail.id, bodyPartId: otterBody.id },
+                { trailId: coastalTrail.id, bodyPartId: lizardTail.id },
+                { trailId: coastalTrail.id, bodyPartId: lizardHead.id },
+                { trailId: coastalTrail.id, bodyPartId: lizardBody.id },
+                // Sentosa Imbiah Trail: Lion (3 parts) + Koel (3 parts) + Beetle (3 parts)
+                { trailId: imbiahTrail.id, bodyPartId: lionTail.id },
+                { trailId: imbiahTrail.id, bodyPartId: lionHead.id },
+                { trailId: imbiahTrail.id, bodyPartId: lionBody.id },
+                { trailId: imbiahTrail.id, bodyPartId: koelTail.id },
+                { trailId: imbiahTrail.id, bodyPartId: koelHeadBody.id },
+                { trailId: imbiahTrail.id, bodyPartId: koelClaws.id },
+                { trailId: imbiahTrail.id, bodyPartId: beetleHead.id },
+                { trailId: imbiahTrail.id, bodyPartId: beetleBody.id },
+                { trailId: imbiahTrail.id, bodyPartId: beetleAntenna.id },
             ],
         });
         console.log('✓ Linked body parts to trails\n');
@@ -259,67 +479,173 @@ async function main() {
     // Create questions (check if exist first)
     const existingQuestions = await prisma.question.count();
     if (existingQuestions === 0) {
-        // Q1: What is the name for a city that beats the heat?
+        // Coastal Trail Questions
         await prisma.question.create({
             data: {
                 trailId: coastalTrail.id,
-                bodyPartId: kingstonFeet.id,
-                question: 'What is the name for a city that beats the heat?',
-                type: 'OPEN',
-                options: {
-                    create: [
-                        { description: 'City in Nature', correct: true },
-                    ],
-                },
-            },
-        });
-
-        // Q2: Which of the following is false?
-        await prisma.question.create({
-            data: {
-                trailId: coastalTrail.id,
-                bodyPartId: kingstonBody.id,
-                question: 'Which of the following is false?',
+                bodyPartId: spiderLegs.id,
+                question: 'Body part to be earned: Spider Legs',
                 type: 'MCQ',
                 options: {
                     create: [
-                        { description: 'There are 9 animals shown on the poster', correct: false },
-                        { description: 'We should only focus on taking care of a few important and cool animals', correct: true },
-                        { description: 'Another name for the Long Tailed Macaques is Crab-Eating Macaque', correct: false },
-                        { description: 'The thick-billed green pigeon is an endangered species', correct: false },
+                        { description: 'Spider Legs', correct: true },
+                        { description: 'Spider Head', correct: false },
+                        { description: 'Spider Body', correct: false },
+                        { description: 'Otter Tail', correct: false },
                     ],
                 },
             },
         });
 
-        // Q3: Bonus Activity: How many steps did you take to get here, from the base of the stairs?
         await prisma.question.create({
             data: {
                 trailId: coastalTrail.id,
-                bodyPartId: sallyShell.id,
-                question: 'Bonus Activity: How many steps did you take to get here, from the base of the stairs?',
-                type: 'OPEN',
-                options: {
-                    create: [
-                        { description: '15', correct: true },
-                    ],
-                },
-            },
-        });
-
-        // Q4: What kind of harsh conditions do coastal forests face?
-        await prisma.question.create({
-            data: {
-                trailId: coastalTrail.id,
-                bodyPartId: sallyBody.id,
-                question: 'What kind of harsh conditions do coastal forests face?',
+                bodyPartId: spiderHead.id,
+                question: 'Body part to be earned: Spider Head',
                 type: 'MCQ',
                 options: {
                     create: [
-                        { description: 'Salt-laden winds', correct: false },
-                        { description: 'Difficult terrains', correct: false },
-                        { description: 'Poor soil', correct: false },
-                        { description: 'All of the above', correct: true },
+                        { description: 'Spider Head', correct: true },
+                        { description: 'Spider Legs', correct: false },
+                        { description: 'Spider Body', correct: false },
+                        { description: 'Otter Head', correct: false },
+                    ],
+                },
+            },
+        });
+
+        await prisma.question.create({
+            data: {
+                trailId: coastalTrail.id,
+                bodyPartId: spiderBody.id,
+                question: 'Body part to be earned: Spider Body',
+                type: 'MCQ',
+                options: {
+                    create: [
+                        { description: 'Spider Body', correct: true },
+                        { description: 'Spider Legs', correct: false },
+                        { description: 'Spider Head', correct: false },
+                        { description: 'Otter Body', correct: false },
+                    ],
+                },
+            },
+        });
+
+        await prisma.question.create({
+            data: {
+                trailId: coastalTrail.id,
+                bodyPartId: otterTail.id,
+                question: 'Body part to be earned: Otter Tail',
+                type: 'MCQ',
+                options: {
+                    create: [
+                        { description: 'Otter Tail', correct: true },
+                        { description: 'Otter Head', correct: false },
+                        { description: 'Otter Body', correct: false },
+                        { description: 'Lizard Tail', correct: false },
+                    ],
+                },
+            },
+        });
+
+        await prisma.question.create({
+            data: {
+                trailId: coastalTrail.id,
+                bodyPartId: otterHead.id,
+                question: 'Body part to be earned: Otter Head',
+                type: 'MCQ',
+                options: {
+                    create: [
+                        { description: 'Otter Head', correct: true },
+                        { description: 'Otter Tail', correct: false },
+                        { description: 'Otter Body', correct: false },
+                        { description: 'Lizard Head', correct: false },
+                    ],
+                },
+            },
+        });
+
+        await prisma.question.create({
+            data: {
+                trailId: coastalTrail.id,
+                bodyPartId: otterBody.id,
+                question: 'Body part to be earned: Otter Body',
+                type: 'MCQ',
+                options: {
+                    create: [
+                        { description: 'Otter Body', correct: true },
+                        { description: 'Otter Tail', correct: false },
+                        { description: 'Otter Head', correct: false },
+                        { description: 'Lizard Body', correct: false },
+                    ],
+                },
+            },
+        });
+
+        await prisma.question.create({
+            data: {
+                trailId: coastalTrail.id,
+                bodyPartId: lizardTail.id,
+                question: 'Body part to be earned: Lizard Tail',
+                type: 'MCQ',
+                options: {
+                    create: [
+                        { description: 'Lizard Tail', correct: true },
+                        { description: 'Lizard Head', correct: false },
+                        { description: 'Lizard Body', correct: false },
+                        { description: 'Lion Tail', correct: false },
+                    ],
+                },
+            },
+        });
+
+        await prisma.question.create({
+            data: {
+                trailId: coastalTrail.id,
+                bodyPartId: lizardHead.id,
+                question: 'Body part to be earned: Lizard Head',
+                type: 'MCQ',
+                options: {
+                    create: [
+                        { description: 'Lizard Head', correct: true },
+                        { description: 'Lizard Tail', correct: false },
+                        { description: 'Lizard Body', correct: false },
+                        { description: 'Lion Head', correct: false },
+                    ],
+                },
+            },
+        });
+
+        await prisma.question.create({
+            data: {
+                trailId: coastalTrail.id,
+                bodyPartId: lizardBody.id,
+                question: 'Body part to be earned: Lizard Body',
+                type: 'MCQ',
+                options: {
+                    create: [
+                        { description: 'Lizard Body', correct: true },
+                        { description: 'Lizard Tail', correct: false },
+                        { description: 'Lizard Head', correct: false },
+                        { description: 'Lion Body', correct: false },
+                    ],
+                },
+            },
+        });
+
+        // Imbiah Trail Questions
+        await prisma.question.create({
+            data: {
+                trailId: imbiahTrail.id,
+                bodyPartId: lionTail.id,
+                question: 'Body part to be earned: Lion Tail',
+                type: 'MCQ',
+                options: {
+                    create: [
+                        { description: 'Lion Tail', correct: true },
+                        { description: 'Lion Head', correct: false },
+                        { description: 'Lion Body', correct: false },
+                        { description: 'Koel Tail', correct: false },
                     ],
                 },
             },
@@ -328,13 +654,15 @@ async function main() {
         await prisma.question.create({
             data: {
                 trailId: imbiahTrail.id,
-                bodyPartId: sallyAntennae.id,
-                question: 'What body part does Sally use to sense her environment?',
-                type: 'OPEN',
+                bodyPartId: lionHead.id,
+                question: 'Body part to be earned: Lion Head',
+                type: 'MCQ',
                 options: {
                     create: [
-                        { description: 'Antennae', correct: true },
-                        { description: 'Tentacles', correct: true },
+                        { description: 'Lion Head', correct: true },
+                        { description: 'Lion Tail', correct: false },
+                        { description: 'Lion Body', correct: false },
+                        { description: 'Koel Head & Body', correct: false },
                     ],
                 },
             },
@@ -343,19 +671,122 @@ async function main() {
         await prisma.question.create({
             data: {
                 trailId: imbiahTrail.id,
-                bodyPartId: coreyClaw.id,
-                question: 'What color is Corey the Hermit Crab?',
+                bodyPartId: lionBody.id,
+                question: 'Body part to be earned: Lion Body',
                 type: 'MCQ',
                 options: {
                     create: [
-                        { description: 'Red', correct: true },
-                        { description: 'Blue', correct: false },
-                        { description: 'Green', correct: false },
+                        { description: 'Lion Body', correct: true },
+                        { description: 'Lion Tail', correct: false },
+                        { description: 'Lion Head', correct: false },
+                        { description: 'Beetle Body', correct: false },
                     ],
                 },
             },
         });
-        console.log('✓ Created 6 questions with options\n');
+
+        await prisma.question.create({
+            data: {
+                trailId: imbiahTrail.id,
+                bodyPartId: koelTail.id,
+                question: 'Body part to be earned: Koel Tail',
+                type: 'MCQ',
+                options: {
+                    create: [
+                        { description: 'Koel Tail', correct: true },
+                        { description: 'Koel Head & Body', correct: false },
+                        { description: 'Koel Claws', correct: false },
+                        { description: 'Lion Tail', correct: false },
+                    ],
+                },
+            },
+        });
+
+        await prisma.question.create({
+            data: {
+                trailId: imbiahTrail.id,
+                bodyPartId: koelHeadBody.id,
+                question: 'Body part to be earned: Koel Head & Body',
+                type: 'MCQ',
+                options: {
+                    create: [
+                        { description: 'Koel Head & Body', correct: true },
+                        { description: 'Koel Tail', correct: false },
+                        { description: 'Koel Claws', correct: false },
+                        { description: 'Beetle Head', correct: false },
+                    ],
+                },
+            },
+        });
+
+        await prisma.question.create({
+            data: {
+                trailId: imbiahTrail.id,
+                bodyPartId: koelClaws.id,
+                question: 'Body part to be earned: Koel Claws',
+                type: 'MCQ',
+                options: {
+                    create: [
+                        { description: 'Koel Claws', correct: true },
+                        { description: 'Koel Tail', correct: false },
+                        { description: 'Koel Head & Body', correct: false },
+                        { description: 'Beetle Antenna', correct: false },
+                    ],
+                },
+            },
+        });
+
+        await prisma.question.create({
+            data: {
+                trailId: imbiahTrail.id,
+                bodyPartId: beetleHead.id,
+                question: 'Body part to be earned: Beetle Head',
+                type: 'MCQ',
+                options: {
+                    create: [
+                        { description: 'Beetle Head', correct: true },
+                        { description: 'Beetle Body', correct: false },
+                        { description: 'Beetle Antenna', correct: false },
+                        { description: 'Koel Head & Body', correct: false },
+                    ],
+                },
+            },
+        });
+
+        await prisma.question.create({
+            data: {
+                trailId: imbiahTrail.id,
+                bodyPartId: beetleBody.id,
+                question: 'Body part to be earned: Beetle Body',
+                type: 'MCQ',
+                options: {
+                    create: [
+                        { description: 'Beetle Body', correct: true },
+                        { description: 'Beetle Head', correct: false },
+                        { description: 'Beetle Antenna', correct: false },
+                        { description: 'Lion Body', correct: false },
+                    ],
+                },
+            },
+        });
+
+        await prisma.question.create({
+            data: {
+                trailId: imbiahTrail.id,
+                bodyPartId: beetleAntenna.id,
+                question: 'Body part to be earned: Beetle Antenna',
+                type: 'MCQ',
+                options: {
+                    create: [
+                        { description: 'Beetle Antenna', correct: true },
+                        { description: 'Beetle Head', correct: false },
+                        { description: 'Beetle Body', correct: false },
+                        { description: 'Koel Claws', correct: false },
+                    ],
+                },
+            },
+        });
+        console.log('✓ Created 18 questions with options\n');
     } else {
         console.log('✓ Questions already exist\n');
     }
@@ -368,12 +799,13 @@ async function main() {
     if (existingUserBodyParts === 0) {
         await prisma.userBodyPart.createMany({
             data: [
-                // Give user all of Corey's parts (make Corey completed)
-                { userId: user.id, bodyPartId: coreyClaw.id },
-                { userId: user.id, bodyPartId: coreyShell.id },
-                // Give user all of Kingston's parts (make Kingston completed)
-                { userId: user.id, bodyPartId: kingstonFeet.id },
-                { userId: user.id, bodyPartId: kingstonBody.id },
+                // Give user all of Spider's parts (make Spider completed)
+                { userId: user.id, bodyPartId: spiderLegs.id },
+                { userId: user.id, bodyPartId: spiderHead.id },
+                { userId: user.id, bodyPartId: spiderBody.id },
+                // Give user partial Otter parts (2 out of 3)
+                { userId: user.id, bodyPartId: otterTail.id },
+                { userId: user.id, bodyPartId: otterBody.id },
             ],
         });
         console.log('✓ Added body parts for user "zacc"\n');
