@@ -61,6 +61,7 @@ router.get('/:id', requireAuth, async (req, res) => {
         name: tb.bodyPart.name,
         rarity: tb.bodyPart.rarity,
         imageUrl: tb.bodyPart.imageUrl,
+        imageUrlZoomed: tb.bodyPart.imageUrlZoomed,
         forestFriend: tb.bodyPart.forestFriend.name,
         found: tb.bodyPart.userBodyParts.length > 0,
     }));

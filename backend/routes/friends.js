@@ -1,6 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
+const { forestFriendAssets, generalAssets } = require('../config/s3Assets');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -41,6 +42,7 @@ router.get('/', requireAuth, async (req, res) => {
             id: friend.id,
             name: friend.name,
             imageUrl: friend.imageUrl,
+            outlineUrl: forestFriendAssets[friend.name.toLowerCase()].outline,
             totalParts,
             foundParts,
             isCompleted,
@@ -59,6 +61,7 @@ router.get('/', requireAuth, async (req, res) => {
     const totalFriends = result.length;
 
     res.json({
+        stickerBookBackground: generalAssets.stickerBookBackground,
         friends: result,
         summary: {
             completedFriends,

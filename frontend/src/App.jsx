@@ -36,7 +36,7 @@ function ProtectedLayout({ children }) {
   return (
     <>
       <TopBar friends={friends} onLogout={handleLogout} />
-      <div className="pt-4">
+      <div>
         {React.cloneElement(children, { refreshFriends })}
       </div>
     </>

@@ -79,9 +79,9 @@ export default function TrailDetail({ refreshFriends }) {
                         <span className="text-[10px] font-bold mb-1 uppercase tracking-wide text-gray-700">{bp.rarity}</span>
                         {bp.found ? (
                             <>
-                                {bp.imageUrl ? (
+                                {bp.imageUrlZoomed ? (
                                     <img
-                                        src={bp.imageUrl}
+                                        src={bp.imageUrlZoomed}
                                         alt={bp.name}
                                         className="w-full h-12 object-contain mb-1"
                                     />

@@ -12,6 +12,7 @@ export default {
       },
       fontFamily: {
         inter: ['Inter', 'sans-serif'],
+        baloo: ['Baloo 2', 'sans-serif'],
       },
     },
   },

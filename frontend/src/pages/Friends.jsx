@@ -26,69 +26,77 @@ export default function Friends({ refreshFriends }) {
     if (loading) return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
     if (error) return <div className="flex items-center justify-center min-h-screen text-red-500">{error}</div>;
 
-    const { friends, summary } = friendsData || { friends: [], summary: { completedFriends: 0, totalFriends: 0 } };
+    const { friends, summary, stickerBookBackground } = friendsData || {
+        friends: [],
+        summary: { completedFriends: 0, totalFriends: 0 },
+        stickerBookBackground: null
+    };
     const username = localStorage.getItem('username') || 'User';
 
+    // Debug: Log the API response
+    console.log('Friends API Response:', friendsData);
+    console.log('Sticker Book Background URL:', stickerBookBackground);
+
     return (
-        <div className="max-w-xl mx-auto p-4">
+        <div className="max-w-xl mx-auto p-4" style={{backgroundColor: '#F4EDD2'}}>
             {/* Header Section */}
-            <div className="mb-6">
-                <p className="text-xl font-normal text-black mb-4">Ready to Explore Sentosa?</p>
+            <div className="mb-3">
+                <p className="text-4xl font-baloo font-extrabold mb-4">Ready to Explore Sentosa, {username}?</p>
 
                 <div className="space-y-3">
-                    <h1 className="text-base font-bold text-black">{username}'s Forest Friends Badges</h1>
                     <p className="text-xs font-normal text-black">
                         Embark on trails, help Forest Friends and collect their badges!
                     </p>
+                    {/* <h1 className="text-base font-bold text-black">{username}'s Sticker Book</h1> */}
                     <p className="text-L font-bold text-black">
                         {summary.completedFriends}/{summary.totalFriends} Friends Found
                     </p>
                 </div>
             </div>
 
-            {/* Friends Grid */}
-            <div className="grid grid-cols-2 gap-3 mb-4">
+            {/* Sticker Book */}
+            <div className="relative w-full">
+                {/* Layer 1: Background - 100% opacity */}
+                {stickerBookBackground && (
+                    <img
+                        src={stickerBookBackground}
+                        alt="Sticker Book Background"
+                        className="w-full h-auto"
+                        style={{ opacity: 1, position: 'relative', zIndex: 0 }}
+                    />
+                )}
+
+                {/* Layer 2: All outlines - 100% opacity */}
                 {friends.map(friend => (
-                    <div key={friend.id} className="flex flex-col items-center gap-1">
-                        {/* Friend Image */}
-                        <div className="w-[160px] h-[130px] mb-2">
-                            {friend.isCompleted && friend.imageUrl ? (
-                                // Show complete friend image when all parts are found
-                                <img
-                                    src={friend.imageUrl}
-                                    alt={friend.name}
-                                    className="w-full h-full object-cover bg-no-repeat"
-                                    style={{
-                                        backgroundSize: friend.name.includes('Hermit Crab') ? '124.89% 214.81%' :
-                                            friend.name.includes('Snail') ? '155.5% 166.3%' :
-                                                '220.76% 261.54%',
-                                        backgroundPosition: friend.name.includes('Hermit Crab') ? '40.82% 52.15%' :
-                                            friend.name.includes('Snail') ? '59.14% 51.71%' :
-                                                '51.69% 44.97%'
-                                    }}
-                                />
-                            ) : (
-                                // Show ??? for incomplete friends
-                                <div className="w-full h-full bg-gray-100 rounded flex items-center justify-center">
-                                    <span className="text-2xl font-bold text-gray-400">???</span>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Friend Name */}
-                        <p className="text-xs font-bold text-black text-center leading-tight whitespace-pre">
-                            {friend.isCompleted ? friend.name : '???'}
-                        </p>
-
-                        {/* Parts Found Status */}
-                        <p className="text-xs font-normal text-black text-center leading-tight">
-                            {friend.foundParts}/{friend.totalParts} Parts Found{friend.isCompleted ? '!' : '!'}
-                        </p>
-                    </div>
+                    friend.outlineUrl && (
+                        <img
+                            key={`outline-${friend.id}`}
+                            src={friend.outlineUrl}
+                            alt={`${friend.name} Outline`}
+                            className="absolute top-0 left-0 w-full h-auto"
+                            style={{ opacity: 1, zIndex: 1 }}
+                        />
+                    )
                 ))}
+
+                {/* Layer 3+: All body parts - conditional opacity */}
+                {friends.flatMap(friend =>
+                    friend.bodyParts.map(part => (
+                        part.imageUrl && (
+                            <img
+                                key={`part-${part.id}`}
+                                src={part.imageUrl}
+                                alt={part.name}
+                                className="absolute top-0 left-0 w-full h-auto"
+                                style={{
+                                    opacity: part.found ? 1 : 0.2,
+                                    zIndex: 2
+                                }}
+                            />
+                        )
+                    ))
+                )}
             </div>
-
-
         </div>
     );
 } 
