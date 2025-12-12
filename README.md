@@ -597,6 +597,55 @@ npm exec prisma db seed
 npm run reseed
 ```
 
+## Schema Changes & Migrations
+
+**IMPORTANT:** The database is hosted on NeonDB (cloud PostgreSQL), not in Docker. Restarting containers does NOT reset the database.
+
+### Development Workflow (Making Schema Changes)
+
+1. **Modify the schema:**
+   ```bash
+   # Edit backend/prisma/schema.prisma
+   ```
+
+2. **Create migration:**
+   ```bash
+   docker-compose exec backend npx prisma migrate dev --name describe_your_change
+   ```
+   This generates a migration file and applies it to NeonDB.
+
+3. **Update seed script if needed:**
+   ```bash
+   # Edit backend/prisma/seed.js to match new schema
+   ```
+
+4. **Reseed database:**
+   ```bash
+   ./seed.sh
+   ```
+
+### Production Deployment
+
+```bash
+# Deploy migrations without prompts (safe for production)
+docker-compose exec backend npx prisma migrate deploy
+```
+
+### Clean Slate (DANGER - Deletes All Data)
+
+```bash
+# Reset database and apply all migrations
+docker-compose exec backend npx prisma migrate reset --force
+```
+
+### Key Reminders
+
+- **Never manually edit migration files** - always modify `schema.prisma` and generate new migrations
+- **Commit migration files** to version control alongside schema changes
+- **NeonDB is persistent** - it's in the cloud, not affected by Docker restarts
+- **Test migrations** on a development database before deploying to production
+- **Breaking changes** (renaming columns, changing types) may require data migration scripts
+
 ## Project Structure
 
 ```

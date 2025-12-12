@@ -131,6 +131,7 @@ async function main() {
                 name: "Spider Legs",
                 rarity: 'COMMON',
                 imageUrl: forestFriendAssets.spider.legs,
+                imageUrlZoomed: forestFriendAssets.spider.legsZoomed,
                 forestFriendId: spider.id,
             },
         });
@@ -145,6 +146,7 @@ async function main() {
                 name: "Spider Head",
                 rarity: 'RARE',
                 imageUrl: forestFriendAssets.spider.head,
+                imageUrlZoomed: forestFriendAssets.spider.headZoomed,
                 forestFriendId: spider.id,
             },
         });
@@ -159,6 +161,7 @@ async function main() {
                 name: "Spider Body",
                 rarity: 'COMMON',
                 imageUrl: forestFriendAssets.spider.body,
+                imageUrlZoomed: forestFriendAssets.spider.bodyZoomed,
                 forestFriendId: spider.id,
             },
         });
@@ -174,6 +177,7 @@ async function main() {
                 name: "Otter Tail",
                 rarity: 'COMMON',
                 imageUrl: forestFriendAssets.otter.tail,
+                imageUrlZoomed: forestFriendAssets.otter.tailZoomed,
                 forestFriendId: otter.id,
             },
         });
@@ -188,6 +192,7 @@ async function main() {
                 name: "Otter Head",
                 rarity: 'RARE',
                 imageUrl: forestFriendAssets.otter.head,
+                imageUrlZoomed: forestFriendAssets.otter.headZoomed,
                 forestFriendId: otter.id,
             },
         });
@@ -202,6 +207,7 @@ async function main() {
                 name: "Otter Body",
                 rarity: 'COMMON',
                 imageUrl: forestFriendAssets.otter.body,
+                imageUrlZoomed: forestFriendAssets.otter.bodyZoomed,
                 forestFriendId: otter.id,
             },
         });
@@ -217,6 +223,7 @@ async function main() {
                 name: "Lizard Tail",
                 rarity: 'COMMON',
                 imageUrl: forestFriendAssets.lizard.tail,
+                imageUrlZoomed: forestFriendAssets.lizard.tailZoomed,
                 forestFriendId: lizard.id,
             },
         });
@@ -231,6 +238,7 @@ async function main() {
                 name: "Lizard Head",
                 rarity: 'RARE',
                 imageUrl: forestFriendAssets.lizard.head,
+                imageUrlZoomed: forestFriendAssets.lizard.headZoomed,
                 forestFriendId: lizard.id,
             },
         });
@@ -245,6 +253,7 @@ async function main() {
                 name: "Lizard Body",
                 rarity: 'COMMON',
                 imageUrl: forestFriendAssets.lizard.body,
+                imageUrlZoomed: forestFriendAssets.lizard.bodyZoomed,
                 forestFriendId: lizard.id,
             },
         });
@@ -260,6 +269,7 @@ async function main() {
                 name: "Lion Tail",
                 rarity: 'COMMON',
                 imageUrl: forestFriendAssets.lion.tail,
+                imageUrlZoomed: forestFriendAssets.lion.tailZoomed,
                 forestFriendId: lion.id,
             },
         });
@@ -274,6 +284,7 @@ async function main() {
                 name: "Lion Head",
                 rarity: 'LEGENDARY',
                 imageUrl: forestFriendAssets.lion.head,
+                imageUrlZoomed: forestFriendAssets.lion.headZoomed,
                 forestFriendId: lion.id,
             },
         });
@@ -288,6 +299,7 @@ async function main() {
                 name: "Lion Body",
                 rarity: 'RARE',
                 imageUrl: forestFriendAssets.lion.body,
+                imageUrlZoomed: forestFriendAssets.lion.bodyZoomed,
                 forestFriendId: lion.id,
             },
         });
@@ -303,6 +315,7 @@ async function main() {
                 name: "Koel Tail",
                 rarity: 'COMMON',
                 imageUrl: forestFriendAssets.koel.tail,
+                imageUrlZoomed: forestFriendAssets.koel.tailZoomed,
                 forestFriendId: koel.id,
             },
         });
@@ -317,6 +330,7 @@ async function main() {
                 name: "Koel Head & Body",
                 rarity: 'RARE',
                 imageUrl: forestFriendAssets.koel.headBody,
+                imageUrlZoomed: forestFriendAssets.koel.headBodyZoomed,
                 forestFriendId: koel.id,
             },
         });
@@ -331,6 +345,7 @@ async function main() {
                 name: "Koel Claws",
                 rarity: 'COMMON',
                 imageUrl: forestFriendAssets.koel.claws,
+                imageUrlZoomed: forestFriendAssets.koel.clawsZoomed,
                 forestFriendId: koel.id,
             },
         });
@@ -346,6 +361,7 @@ async function main() {
                 name: "Beetle Head",
                 rarity: 'COMMON',
                 imageUrl: forestFriendAssets.beetle.head,
+                imageUrlZoomed: forestFriendAssets.beetle.headZoomed,
                 forestFriendId: beetle.id,
             },
         });
@@ -360,6 +376,7 @@ async function main() {
                 name: "Beetle Body",
                 rarity: 'RARE',
                 imageUrl: forestFriendAssets.beetle.body,
+                imageUrlZoomed: forestFriendAssets.beetle.bodyZoomed,
                 forestFriendId: beetle.id,
             },
         });
@@ -374,6 +391,7 @@ async function main() {
                 name: "Beetle Antenna",
                 rarity: 'LEGENDARY',
                 imageUrl: forestFriendAssets.beetle.antenna,
+                imageUrlZoomed: forestFriendAssets.beetle.antennaZoomed,
                 forestFriendId: beetle.id,
             },
         });

@@ -33,10 +33,10 @@ model User {
 }
 
 model ForestFriend {
-  id        Int                   @id @default(autoincrement())
-  name      String
-  imageUrl  String?
-  bodyParts ForestFriendBodyPart[]
+  id             Int                   @id @default(autoincrement())
+  name           String
+  imageUrl       String?
+  bodyParts      ForestFriendBodyPart[]
 }
 
 model ForestFriendBodyPart {
@@ -44,6 +44,7 @@ model ForestFriendBodyPart {
   name            String
   rarity          Rarity
   imageUrl        String?
+  imageUrlZoomed  String?
   forestFriend    ForestFriend   @relation(fields: [forestFriendId], references: [id])
   forestFriendId  Int
   questions       Question[]

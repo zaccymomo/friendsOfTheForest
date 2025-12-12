@@ -17,6 +17,7 @@ CREATE TABLE "User" (
 CREATE TABLE "ForestFriend" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
+    "imageUrl" TEXT,
 
     CONSTRAINT "ForestFriend_pkey" PRIMARY KEY ("id")
 );
@@ -26,6 +27,8 @@ CREATE TABLE "ForestFriendBodyPart" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "rarity" "Rarity" NOT NULL,
+    "imageUrl" TEXT,
+    "imageUrlZoomed" TEXT,
     "forestFriendId" INTEGER NOT NULL,
 
     CONSTRAINT "ForestFriendBodyPart_pkey" PRIMARY KEY ("id")
