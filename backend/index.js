@@ -5,7 +5,12 @@ const { PrismaClient } = require('@prisma/client');
 const app = express();
 const prisma = new PrismaClient();
 
-app.use(cors());
+// Configure CORS for production
+const corsOptions = {
+    origin: process.env.FRONTEND_URL || '*',
+    credentials: true
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const authRouter = require('./routes/auth');

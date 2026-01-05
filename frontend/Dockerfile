@@ -1,7 +1,8 @@
-# Frontend Dockerfile - Development
-FROM node:20-alpine
+# Multi-stage build for production
 
-# Set working directory
+# Stage 1: Build the React application
+FROM node:20-alpine AS builder
+
 WORKDIR /app
 
 # Copy package files
@@ -13,8 +14,24 @@ RUN npm ci --legacy-peer-deps
 # Copy the rest of the application
 COPY . .
 
-# Expose Vite dev server port
-EXPOSE 5173
+# Build argument for API URL
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
 
-# Start Vite dev server
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+# Build the application for production
+RUN npm run build
+
+# Stage 2: Serve with nginx
+FROM nginx:alpine
+
+# Copy built assets from builder stage
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose port 80
+EXPOSE 80
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

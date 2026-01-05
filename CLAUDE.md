@@ -96,7 +96,6 @@ npm run lint
 
 ```
 DATABASE_URL="postgresql://user:password@localhost:5432/database_name"
-JWT_SECRET="your-secret-key"
 PORT=4000  # Optional, defaults to 4000
 ```
 
