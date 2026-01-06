@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
+const { requireAuth } = require('../middleware/auth');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -19,8 +20,8 @@ router.post('/register', async (req, res) => {
     if (existing) return res.status(409).json({ error: 'Username taken' });
     const passwordHash = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({ data: { username, passwordHash } });
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user.id, username: user.username } });
+    const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+    res.json({ token, user: { id: user.id, username: user.username, role: user.role } });
 });
 
 // Login
@@ -31,8 +32,8 @@ router.post('/login', async (req, res) => {
     if (!user) return res.status(401).json({ error: 'Invalid credentials' });
     const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user.id, username: user.username } });
+    const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+    res.json({ token, user: { id: user.id, username: user.username, role: user.role } });
 });
 
 module.exports = router; 

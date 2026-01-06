@@ -5,9 +5,10 @@ const { PrismaClient } = require('@prisma/client');
 const app = express();
 const prisma = new PrismaClient();
 
-// Configure CORS for production
+// Configure CORS for production (support both user and admin frontends)
+const allowedOrigins = [process.env.FRONTEND_URL, process.env.ADMIN_URL].filter(Boolean);
 const corsOptions = {
-    origin: process.env.FRONTEND_URL || '*',
+    origin: allowedOrigins.length > 0 ? allowedOrigins : '*',
     credentials: true
 };
 app.use(cors(corsOptions));
@@ -27,6 +28,9 @@ app.use('/questions', questionsRouter);
 
 const profileRouter = require('./routes/profile');
 app.use('/profile', profileRouter);
+
+const adminRouter = require('./routes/admin');
+app.use('/admin', adminRouter);
 
 app.get('/health', (req, res) => {
     res.json({ status: 'ok' });

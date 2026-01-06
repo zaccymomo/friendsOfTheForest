@@ -4,48 +4,11 @@ A gamified educational trail application where users explore nature trails, answ
 
 ## Quick Start
 
-### Option 1: Docker + Tunnelmole (Recommended for Mobile Access)
+### Option 1: Production (Railway)
 
-The easiest way to get started with mobile phone access:
+The app is deployed at **[your-production-url].railway.app** - just visit and register!
 
-```bash
-# Clone the repository
-git clone <repository-url>
-cd friendsOfTheForest
-
-# Create .env file with your NeonDB connection string
-cat > backend/.env << EOF
-DATABASE_URL="your-neondb-connection-string"
-JWT_SECRET="change-this-to-a-secure-random-string"
-EOF
-
-# Build and start containers (migrations run automatically)
-docker-compose up --build -d
-
-# In another terminal, seed the database
-./seed.sh
-
-# Install tunnelmole globally (for HTTPS access on mobile)
-npm install -g tunnelmole
-
-# Start tunnelmole for backend (in a new terminal)
-tmole 4000
-
-# Start tunnelmole for frontend (in another new terminal)
-tmole 5173
-
-# Copy the backend HTTPS URL and update frontend/.env
-echo "VITE_API_URL=https://[backend-tunnelmole-url]" > frontend/.env
-
-# Restart frontend to apply changes
-docker-compose restart frontend
-```
-
-Then open the frontend tunnelmole HTTPS URL on your phone or computer!
-
-### Option 2: Docker (Local Development Only)
-
-For local development without mobile access:
+### Option 2: Local Development (Docker)
 
 ```bash
 # Clone the repository
@@ -67,7 +30,7 @@ docker-compose up --build
 
 Then open `http://localhost:5173` and register an account!
 
-### Option 3: Manual Setup
+### Option 3: Local Development (Manual Setup)
 
 For experienced developers who prefer local development:
 
@@ -92,56 +55,101 @@ npm run dev
 
 Then open `http://localhost:5173` and register an account!
 
-## Mobile Access with Tunnelmole
+## Production Deployment (Railway)
 
-To access the app from your mobile phone with full QR scanner functionality, use Tunnelmole to create secure HTTPS tunnels:
+The application is deployed on Railway with auto-deployment from GitHub. Every push to the `main` branch automatically triggers a new production deployment.
 
-### Why Tunnelmole?
+### Architecture
 
-- **HTTPS Required**: Mobile browsers require HTTPS to access the camera for QR scanning
-- **No Warning Pages**: Unlike ngrok's free tier, tunnelmole has no interstitial warning pages
-- **Free**: Completely free with no account required
-- **Internet-wide Access**: Share your app URL with anyone, anywhere
+- **Backend Service**: Express.js API running on Railway
+- **Frontend Service**: React SPA served with nginx on Railway
+- **Database**: NeonDB (PostgreSQL) - managed separately
+- **Assets**: AWS S3 for forest friend images
 
-### Setup Steps
+### Environment Variables
 
-1. **Start Docker containers** (if not already running):
-   ```bash
-   docker-compose up -d
-   ```
+**Backend Service (Railway):**
+- `DATABASE_URL` - Your NeonDB connection string
+- `JWT_SECRET` - Secure random string for JWT signing (generate with: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
+- `PORT` - 4000 (default)
+- `FRONTEND_URL` - Frontend Railway URL for CORS (e.g., `https://your-frontend.railway.app`)
 
-2. **Install tunnelmole** globally:
-   ```bash
-   npm install -g tunnelmole
-   ```
+**Frontend Service (Railway):**
+- `VITE_API_URL` - Backend Railway URL (e.g., `https://your-backend.railway.app`)
 
-3. **Start tunnelmole for backend** (in a new terminal):
-   ```bash
-   tmole 4000
-   ```
-   Copy the HTTPS URL (e.g., `https://abc123-ip-xxx-xxx-xxx-xxx.tunnelmole.net`)
+### Auto-Deployment Workflow
 
-4. **Start tunnelmole for frontend** (in another terminal):
-   ```bash
-   tmole 5173
-   ```
-   Copy the HTTPS URL (e.g., `https://def456-ip-xxx-xxx-xxx-xxx.tunnelmole.net`)
+1. **Push to GitHub**: Commit and push changes to the `main` branch
+2. **Railway Webhook**: Railway detects the push via GitHub webhook
+3. **Build**: Railway builds both backend and frontend services in parallel
+4. **Deploy**: New versions are deployed with zero downtime
+5. **Health Check**: Railway verifies services are running
 
-5. **Update frontend configuration**:
-   ```bash
-   echo "VITE_API_URL=https://[backend-tunnelmole-url]" > frontend/.env
-   docker-compose restart frontend
-   ```
+The deployment typically takes 2-3 minutes from push to live.
 
-6. **Access from any device**:
-   - Open the frontend tunnelmole URL on your phone's browser
-   - The QR scanner will work because you're using HTTPS!
+### Manual Deployment
 
-### Important Notes
+If needed, you can manually trigger a deployment from the Railway dashboard:
+1. Go to your project in Railway
+2. Select the service (backend or frontend)
+3. Click "Deploy" → "Redeploy"
 
-- **Keep terminals open**: Tunnelmole needs to stay running in both terminal windows
-- **URLs change on restart**: If you restart tunnelmole, update `frontend/.env` with the new backend URL
-- **Vite configuration**: The `vite.config.js` is already configured to accept tunnelmole hosts
+### Production Build Details
+
+**Frontend:**
+- Multi-stage Docker build reduces image size from ~500MB to ~50MB
+- Production build served via nginx (port 80)
+- Gzip compression enabled
+- Static asset caching (1 year)
+- SPA routing configured
+
+**Backend:**
+- Runs on Node.js 20 Alpine
+- Database migrations run automatically on deploy
+- CORS restricted to frontend URL
+- JWT authentication required for all endpoints except `/auth/*`
+
+### Initial Railway Setup (For Reference)
+
+If deploying a new Railway project:
+
+1. **Create Railway Project**:
+   - Connect your GitHub repository
+   - Railway will detect `docker-compose.yml`
+
+2. **Create Backend Service**:
+   - Root directory: `/backend`
+   - Use `backend/Dockerfile`
+   - Port: 4000
+   - Add environment variables from `backend/.env.example`
+
+3. **Create Frontend Service**:
+   - Root directory: `/frontend`
+   - Use `frontend/Dockerfile`
+   - Port: 80
+   - Add `VITE_API_URL` pointing to backend Railway URL
+
+4. **Configure Auto-Deploy**:
+   - Settings → Deploy → Triggers
+   - Enable "Deploy on push to main"
+
+### Generate QR Codes for Production
+
+QR codes should point to production URLs:
+
+```bash
+# Update the QR code generation script to use production URLs
+# Then run locally or via Railway service shell:
+docker-compose exec backend node generate-qr-codes.js
+```
+
+### Monitoring
+
+Check service health in Railway dashboard:
+- View deployment logs
+- Monitor resource usage
+- Check build status
+- Review error alerts
 
 ## Features
 
@@ -726,13 +734,25 @@ All endpoints except `/auth/*` require JWT authentication via `Authorization: Be
 
 ## Environment Variables
 
-### Backend (.env)
+### Local Development
+
+**Backend (`backend/.env`):**
 
 | Variable | Description | Default |
 |----------|-------------|---------|
 | DATABASE_URL | NeonDB PostgreSQL connection string (must include `?sslmode=require`) | - |
-| JWT_SECRET | Secret key for signing JWT tokens | devsecret |
+| JWT_SECRET | Secret key for signing JWT tokens (use `backend/.env.example` to generate) | - |
 | PORT | Server port | 4000 |
+
+**Frontend (`frontend/.env` - optional for local dev):**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| VITE_API_URL | Backend API URL | http://localhost:4000 |
+
+### Production (Railway)
+
+See the "Production Deployment (Railway)" section above for required environment variables. Never commit `.env` files to version control - use Railway's dashboard to configure production environment variables.
 
 ## Troubleshooting
 

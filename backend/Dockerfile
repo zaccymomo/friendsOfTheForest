@@ -7,13 +7,13 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci
+# Install dependencies (including prisma CLI as devDependency)
+RUN npm ci --include=dev
 
 # Copy prisma schema
 COPY prisma ./prisma
 
-# Generate Prisma Client
+# Generate Prisma Client using locally installed version
 RUN npx prisma generate
 
 # Copy the rest of the application

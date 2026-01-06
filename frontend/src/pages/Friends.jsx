@@ -38,7 +38,7 @@ export default function Friends({ refreshFriends }) {
     console.log('Sticker Book Background URL:', stickerBookBackground);
 
     return (
-        <div className="max-w-xl mx-auto p-4" style={{backgroundColor: '#F4EDD2'}}>
+        <div className="max-w-xl mx-auto p-4">
             {/* Header Section */}
             <div className="mb-3">
                 <p className="text-4xl font-baloo font-extrabold mb-4">Ready to Explore Sentosa, {username}?</p>

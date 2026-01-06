@@ -27,7 +27,20 @@ async function main() {
             passwordHash: testPasswordHash,
         },
     });
-    console.log('✓ Ensured user exists: test\n');
+    console.log('✓ Ensured user exists: test');
+
+    // Create admin user
+    const adminPasswordHash = await bcrypt.hash('admin', 10);
+    await prisma.user.upsert({
+        where: { username: 'admin' },
+        update: {},
+        create: {
+            username: 'admin',
+            passwordHash: adminPasswordHash,
+            role: 'ADMIN',
+        },
+    });
+    console.log('✓ Ensured admin user exists (username: admin, password: admin)\n');
 
     // Create forest friends (check if exist first)
     let spider = await prisma.forestFriend.findFirst({
