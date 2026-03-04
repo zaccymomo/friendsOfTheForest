@@ -2,8 +2,11 @@ const { PrismaClient } = require('@prisma/client');
 const QRCode = require('qrcode');
 const fs = require('fs');
 const path = require('path');
-
 const prisma = new PrismaClient();
+
+// Set FRONTEND_URL env var before running, or it defaults to localhost
+// On Railway: already set in environment. Locally: set in shell or use default
+const FRONTEND_URL = (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/$/, '');
 
 async function generateQRCodeData() {
     try {
@@ -72,9 +75,12 @@ async function generateQRCodeData() {
             const filename = `question_${question.id}_${trailName}.png`;
             const filepath = path.join(qrCodesDir, filename);
 
+            const qrUrl = `${FRONTEND_URL}/question/${question.id}`;
+            console.log(`URL: ${qrUrl}`);
+
             try {
                 // Generate QR code and save to file
-                await QRCode.toFile(filepath, String(question.id), {
+                await QRCode.toFile(filepath, qrUrl, {
                     width: 400,
                     margin: 2,
                     color: {

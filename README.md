@@ -6,7 +6,7 @@ A gamified educational trail application where users explore nature trails, answ
 
 ### Option 1: Production (Railway)
 
-The app is deployed at **[your-production-url].railway.app** - just visit and register!
+The app is deployed at **https://friendsoftheforest-frontend-production.up.railway.app** - just visit and register!
 
 ### Option 2: Local Development (Docker)
 
@@ -135,13 +135,14 @@ If deploying a new Railway project:
 
 ### Generate QR Codes for Production
 
-QR codes should point to production URLs:
+Run locally with the production frontend URL:
 
 ```bash
-# Update the QR code generation script to use production URLs
-# Then run locally or via Railway service shell:
-docker-compose exec backend node generate-qr-codes.js
+cd backend
+FRONTEND_URL=https://friendsoftheforest-frontend-production.up.railway.app node generate-qr-codes.js
 ```
+
+QR code PNG files are saved to `backend/qr-codes/`. Each QR code encodes a full URL (e.g., `https://friendsoftheforest-frontend-production.up.railway.app/question/1`) so they work from any phone camera app — scanning opens the browser directly to the question page.
 
 ### Monitoring
 
@@ -444,6 +445,7 @@ docker-compose down
 The application will be available at:
 - Frontend: `http://localhost:5173`
 - Backend API: `http://localhost:4000`
+- Admin portal: `http://localhost:5174`
 
 ### Manual Setup
 
@@ -499,20 +501,21 @@ This opens a browser interface at `http://localhost:5555`
 
 ### Generate QR Codes
 
-To generate QR codes for questions:
+Generate QR code PNG files for all questions and save them to `backend/qr-codes/`:
 
-**With Docker:**
-```bash
-docker-compose exec backend node generate-qr-codes.js
-```
-
-**Manual Setup:**
+**For local development** (QR codes link to localhost):
 ```bash
 cd backend
 node generate-qr-codes.js
 ```
 
-This creates QR codes linking to question IDs that can be printed and placed at trail locations.
+**For production** (QR codes link to the live Railway app):
+```bash
+cd backend
+FRONTEND_URL=https://friendsoftheforest-frontend-production.up.railway.app node generate-qr-codes.js
+```
+
+Each QR code encodes a full URL. Scanning with a native phone camera opens the app directly to the question page. The in-app QR scanner also handles these codes.
 
 ### Linting
 

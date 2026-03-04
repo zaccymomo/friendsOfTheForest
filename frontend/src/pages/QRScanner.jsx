@@ -79,9 +79,19 @@ export default function QRScanner() {
                 console.log('QR Code scanned:', scannedText);
                 lastScannedRef.current = scannedText;
 
-                // Check if the scanned text is a valid question ID (number)
-                const questionId = parseInt(scannedText, 10);
-                if (!isNaN(questionId) && questionId > 0) {
+                // Check if the scanned text is a URL containing a question ID
+                let questionId = null;
+                try {
+                    const url = new URL(scannedText);
+                    const match = url.pathname.match(/\/question\/(\d+)/);
+                    if (match) questionId = parseInt(match[1], 10);
+                } catch {
+                    // Not a URL - try parsing as a plain numeric ID (legacy support)
+                    const parsed = parseInt(scannedText, 10);
+                    if (!isNaN(parsed) && parsed > 0) questionId = parsed;
+                }
+
+                if (questionId !== null && questionId > 0) {
                     console.log('Navigating to question:', questionId);
 
                     // Immediately stop scanning and mark as navigating
