@@ -41,7 +41,7 @@ export default function QuestionList() {
     { key: 'question', label: 'Question', render: (row) => row.question.substring(0, 60) + '...' },
     { key: 'trail', label: 'Trail', render: (row) => row.trail.name },
     { key: 'type', label: 'Type' },
-    { key: 'bodyPart', label: 'Reward', render: (row) => row.bodyPart ? `${row.bodyPart.forestFriend.name} - ${row.bodyPart.name}` : 'None' }
+    { key: 'bodyParts', label: 'Rewards', render: (row) => row.bodyParts && row.bodyParts.length > 0 ? row.bodyParts.map(qbp => `${qbp.bodyPart.forestFriend.name} - ${qbp.bodyPart.name}`).join(', ') : 'None' }
   ];
 
   if (loading) {

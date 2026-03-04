@@ -269,7 +269,7 @@ router.get('/trails/:id', async (req, res) => {
             include: {
                 photos: true,
                 questions: {
-                    include: { options: true, bodyPart: true }
+                    include: { options: true, bodyParts: { include: { bodyPart: { include: { forestFriend: true } } } } }
                 },
                 bodyParts: {
                     include: { bodyPart: { include: { forestFriend: true } } }
@@ -424,7 +424,7 @@ router.get('/questions', async (req, res) => {
         const questions = await prisma.question.findMany({
             include: {
                 trail: true,
-                bodyPart: { include: { forestFriend: true } },
+                bodyParts: { include: { bodyPart: { include: { forestFriend: true } } } },
                 options: true
             },
             orderBy: { id: 'asc' }
@@ -442,7 +442,7 @@ router.get('/questions/:id', async (req, res) => {
             where: { id: parseInt(req.params.id) },
             include: {
                 trail: true,
-                bodyPart: { include: { forestFriend: true } },
+                bodyParts: { include: { bodyPart: { include: { forestFriend: true } } } },
                 options: true
             }
         });
@@ -456,7 +456,7 @@ router.get('/questions/:id', async (req, res) => {
 // POST /admin/questions - Create question with options
 router.post('/questions', async (req, res) => {
     try {
-        const { trailId, bodyPartId, question, type, options } = req.body;
+        const { trailId, bodyPartIds, question, type, options } = req.body;
         if (!trailId || !question || !type || !options) {
             return res.status(400).json({ error: 'trailId, question, type, and options are required' });
         }
@@ -464,7 +464,6 @@ router.post('/questions', async (req, res) => {
         const newQuestion = await prisma.question.create({
             data: {
                 trailId: parseInt(trailId),
-                bodyPartId: bodyPartId ? parseInt(bodyPartId) : null,
                 question,
                 type,
                 options: {
@@ -472,9 +471,12 @@ router.post('/questions', async (req, res) => {
                         description: opt.description,
                         correct: opt.correct
                     }))
+                },
+                bodyParts: {
+                    create: (bodyPartIds || []).map(id => ({ bodyPartId: parseInt(id) }))
                 }
             },
-            include: { options: true, bodyPart: true, trail: true }
+            include: { options: true, bodyParts: { include: { bodyPart: { include: { forestFriend: true } } } }, trail: true }
         });
         res.json(newQuestion);
     } catch (error) {
@@ -485,20 +487,20 @@ router.post('/questions', async (req, res) => {
 // PUT /admin/questions/:id - Update question
 router.put('/questions/:id', async (req, res) => {
     try {
-        const { trailId, bodyPartId, question, type, options } = req.body;
+        const { trailId, bodyPartIds, question, type, options } = req.body;
         const id = parseInt(req.params.id);
 
         const existing = await prisma.question.findUnique({ where: { id } });
         if (!existing) return res.status(404).json({ error: 'Question not found' });
 
-        // Delete existing options and create new ones (simpler than update)
+        // Delete existing options and body part links, then recreate
         await prisma.option.deleteMany({ where: { questionId: id } });
+        await prisma.questionBodyPart.deleteMany({ where: { questionId: id } });
 
         const updated = await prisma.question.update({
             where: { id },
             data: {
                 trailId: parseInt(trailId),
-                bodyPartId: bodyPartId ? parseInt(bodyPartId) : null,
                 question,
                 type,
                 options: {
@@ -506,9 +508,12 @@ router.put('/questions/:id', async (req, res) => {
                         description: opt.description,
                         correct: opt.correct
                     }))
+                },
+                bodyParts: {
+                    create: (bodyPartIds || []).map(id => ({ bodyPartId: parseInt(id) }))
                 }
             },
-            include: { options: true, bodyPart: true, trail: true }
+            include: { options: true, bodyParts: { include: { bodyPart: { include: { forestFriend: true } } } }, trail: true }
         });
         res.json(updated);
     } catch (error) {

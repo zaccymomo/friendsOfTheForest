@@ -3,13 +3,17 @@ const prisma = new PrismaClient();
 
 async function generateQRCodeData() {
     try {
-        // Get all questions with options
+        // Get all questions with options and related body parts
         const questions = await prisma.question.findMany({
             include: {
                 trail: true,
-                bodyPart: {
+                bodyParts: {
                     include: {
-                        forestFriend: true
+                        bodyPart: {
+                            include: {
+                                forestFriend: true
+                            }
+                        }
                     }
                 },
                 options: true
@@ -18,10 +22,18 @@ async function generateQRCodeData() {
 
         console.log('\n=== QR CODES TO GENERATE ===\n');
 
+
         questions.forEach(question => {
             console.log(`Question ID: ${question.id}`);
             console.log(`Trail: ${question.trail.name}`);
-            console.log(`For: ${question.bodyPart?.forestFriend?.name || 'Unknown'} - ${question.bodyPart?.name || 'Unknown'}`);
+            if (question.bodyParts && question.bodyParts.length > 0) {
+                question.bodyParts.forEach(qbp => {
+                    const bp = qbp.bodyPart;
+                    console.log(`For: ${bp?.forestFriend?.name || 'Unknown'} - ${bp?.name || 'Unknown'}`);
+                });
+            } else {
+                console.log('For: None');
+            }
             console.log(`Question: ${question.question}`);
             console.log(`Type: ${question.type}`);
 

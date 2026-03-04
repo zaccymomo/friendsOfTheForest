@@ -55,7 +55,7 @@ model ForestFriendBodyPart {
   imageUrlZoomed  String?
   forestFriend    ForestFriend   @relation(fields: [forestFriendId], references: [id], onDelete: Cascade)
   forestFriendId  Int
-  questions       Question[]
+  questions       QuestionBodyPart[]
   userBodyParts   UserBodyPart[]
   trailBodyParts  TrailBodyPart[]
 }
@@ -82,11 +82,10 @@ model Question {
   id            Int                @id @default(autoincrement())
   trail         Trail              @relation(fields: [trailId], references: [id], onDelete: Cascade)
   trailId       Int
-  bodyPart      ForestFriendBodyPart? @relation(fields: [bodyPartId], references: [id], onDelete: SetNull)
-  bodyPartId    Int?
   question      String
   type          QuestionType
   options       Option[]
+  bodyParts     QuestionBodyPart[]
 }
 
 model Option {
@@ -95,6 +94,14 @@ model Option {
   questionId  Int
   description String
   correct     Boolean
+}
+
+model QuestionBodyPart {
+  question    Question              @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId  Int
+  bodyPart    ForestFriendBodyPart  @relation(fields: [bodyPartId], references: [id], onDelete: Cascade)
+  bodyPartId  Int
+  @@id([questionId, bodyPartId])
 }
 
 model UserBodyPart {

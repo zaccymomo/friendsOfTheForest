@@ -514,7 +514,6 @@ async function main() {
         await prisma.question.create({
             data: {
                 trailId: coastalTrail.id,
-                bodyPartId: spiderLegs.id,
                 question: 'Body part to be earned: Spider Legs',
                 type: 'MCQ',
                 options: {
@@ -525,13 +524,13 @@ async function main() {
                         { description: 'Otter Tail', correct: false },
                     ],
                 },
+                bodyParts: { create: [{ bodyPartId: spiderLegs.id }] },
             },
         });
 
         await prisma.question.create({
             data: {
                 trailId: coastalTrail.id,
-                bodyPartId: spiderHead.id,
                 question: 'Body part to be earned: Spider Head',
                 type: 'MCQ',
                 options: {
@@ -542,13 +541,13 @@ async function main() {
                         { description: 'Otter Head', correct: false },
                     ],
                 },
+                bodyParts: { create: [{ bodyPartId: spiderHead.id }] },
             },
         });
 
         await prisma.question.create({
             data: {
                 trailId: coastalTrail.id,
-                bodyPartId: spiderBody.id,
                 question: 'Body part to be earned: Spider Body',
                 type: 'MCQ',
                 options: {
@@ -559,13 +558,13 @@ async function main() {
                         { description: 'Otter Body', correct: false },
                     ],
                 },
+                bodyParts: { create: [{ bodyPartId: spiderBody.id }] },
             },
         });
 
         await prisma.question.create({
             data: {
                 trailId: coastalTrail.id,
-                bodyPartId: otterTail.id,
                 question: 'Body part to be earned: Otter Tail',
                 type: 'MCQ',
                 options: {
@@ -576,13 +575,13 @@ async function main() {
                         { description: 'Lizard Tail', correct: false },
                     ],
                 },
+                bodyParts: { create: [{ bodyPartId: otterTail.id }] },
             },
         });
 
         await prisma.question.create({
             data: {
                 trailId: coastalTrail.id,
-                bodyPartId: otterHead.id,
                 question: 'Body part to be earned: Otter Head',
                 type: 'MCQ',
                 options: {
@@ -593,13 +592,13 @@ async function main() {
                         { description: 'Lizard Head', correct: false },
                     ],
                 },
+                bodyParts: { create: [{ bodyPartId: otterHead.id }] },
             },
         });
 
         await prisma.question.create({
             data: {
                 trailId: coastalTrail.id,
-                bodyPartId: otterBody.id,
                 question: 'Body part to be earned: Otter Body',
                 type: 'MCQ',
                 options: {
@@ -610,13 +609,13 @@ async function main() {
                         { description: 'Lizard Body', correct: false },
                     ],
                 },
+                bodyParts: { create: [{ bodyPartId: otterBody.id }] },
             },
         });
 
         await prisma.question.create({
             data: {
                 trailId: coastalTrail.id,
-                bodyPartId: lizardTail.id,
                 question: 'Body part to be earned: Lizard Tail',
                 type: 'MCQ',
                 options: {
@@ -627,13 +626,13 @@ async function main() {
                         { description: 'Lion Tail', correct: false },
                     ],
                 },
+                bodyParts: { create: [{ bodyPartId: lizardTail.id }] },
             },
         });
 
         await prisma.question.create({
             data: {
                 trailId: coastalTrail.id,
-                bodyPartId: lizardHead.id,
                 question: 'Body part to be earned: Lizard Head',
                 type: 'MCQ',
                 options: {
@@ -644,13 +643,13 @@ async function main() {
                         { description: 'Lion Head', correct: false },
                     ],
                 },
+                bodyParts: { create: [{ bodyPartId: lizardHead.id }] },
             },
         });
 
         await prisma.question.create({
             data: {
                 trailId: coastalTrail.id,
-                bodyPartId: lizardBody.id,
                 question: 'Body part to be earned: Lizard Body',
                 type: 'MCQ',
                 options: {
@@ -661,6 +660,7 @@ async function main() {
                         { description: 'Lion Body', correct: false },
                     ],
                 },
+                bodyParts: { create: [{ bodyPartId: lizardBody.id }] },
             },
         });
 
@@ -668,7 +668,6 @@ async function main() {
         await prisma.question.create({
             data: {
                 trailId: imbiahTrail.id,
-                bodyPartId: lionTail.id,
                 question: 'Body part to be earned: Lion Tail',
                 type: 'MCQ',
                 options: {
@@ -679,13 +678,13 @@ async function main() {
                         { description: 'Koel Tail', correct: false },
                     ],
                 },
+                bodyParts: { create: [{ bodyPartId: lionTail.id }] },
             },
         });
 
         await prisma.question.create({
             data: {
                 trailId: imbiahTrail.id,
-                bodyPartId: lionHead.id,
                 question: 'Body part to be earned: Lion Head',
                 type: 'MCQ',
                 options: {
@@ -696,13 +695,13 @@ async function main() {
                         { description: 'Koel Head & Body', correct: false },
                     ],
                 },
+                bodyParts: { create: [{ bodyPartId: lionHead.id }] },
             },
         });
 
         await prisma.question.create({
             data: {
                 trailId: imbiahTrail.id,
-                bodyPartId: lionBody.id,
                 question: 'Body part to be earned: Lion Body',
                 type: 'MCQ',
                 options: {
@@ -713,13 +712,13 @@ async function main() {
                         { description: 'Beetle Body', correct: false },
                     ],
                 },
+                bodyParts: { create: [{ bodyPartId: lionBody.id }] },
             },
         });
 
         await prisma.question.create({
             data: {
                 trailId: imbiahTrail.id,
-                bodyPartId: koelTail.id,
                 question: 'Body part to be earned: Koel Tail',
                 type: 'MCQ',
                 options: {
@@ -730,13 +729,13 @@ async function main() {
                         { description: 'Lion Tail', correct: false },
                     ],
                 },
+                bodyParts: { create: [{ bodyPartId: koelTail.id }] },
             },
         });
 
         await prisma.question.create({
             data: {
                 trailId: imbiahTrail.id,
-                bodyPartId: koelHeadBody.id,
                 question: 'Body part to be earned: Koel Head & Body',
                 type: 'MCQ',
                 options: {
@@ -747,13 +746,13 @@ async function main() {
                         { description: 'Beetle Head', correct: false },
                     ],
                 },
+                bodyParts: { create: [{ bodyPartId: koelHeadBody.id }] },
             },
         });
 
         await prisma.question.create({
             data: {
                 trailId: imbiahTrail.id,
-                bodyPartId: koelClaws.id,
                 question: 'Body part to be earned: Koel Claws',
                 type: 'MCQ',
                 options: {
@@ -764,13 +763,13 @@ async function main() {
                         { description: 'Beetle Antenna', correct: false },
                     ],
                 },
+                bodyParts: { create: [{ bodyPartId: koelClaws.id }] },
             },
         });
 
         await prisma.question.create({
             data: {
                 trailId: imbiahTrail.id,
-                bodyPartId: beetleHead.id,
                 question: 'Body part to be earned: Beetle Head',
                 type: 'MCQ',
                 options: {
@@ -781,13 +780,13 @@ async function main() {
                         { description: 'Koel Head & Body', correct: false },
                     ],
                 },
+                bodyParts: { create: [{ bodyPartId: beetleHead.id }] },
             },
         });
 
         await prisma.question.create({
             data: {
                 trailId: imbiahTrail.id,
-                bodyPartId: beetleBody.id,
                 question: 'Body part to be earned: Beetle Body',
                 type: 'MCQ',
                 options: {
@@ -798,13 +797,13 @@ async function main() {
                         { description: 'Lion Body', correct: false },
                     ],
                 },
+                bodyParts: { create: [{ bodyPartId: beetleBody.id }] },
             },
         });
 
         await prisma.question.create({
             data: {
                 trailId: imbiahTrail.id,
-                bodyPartId: beetleAntenna.id,
                 question: 'Body part to be earned: Beetle Antenna',
                 type: 'MCQ',
                 options: {
@@ -815,6 +814,7 @@ async function main() {
                         { description: 'Koel Claws', correct: false },
                     ],
                 },
+                bodyParts: { create: [{ bodyPartId: beetleAntenna.id }] },
             },
         });
         console.log('✓ Created 18 questions with options\n');

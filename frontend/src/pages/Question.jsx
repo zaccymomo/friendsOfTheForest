@@ -88,7 +88,19 @@ export default function Question({ refreshFriends }) {
                     <div className="mt-4 w-full text-center">
                         {result.correct ? (
                             <div className="text-green-600 font-bold mb-4">
-                                Correct! {result.awarded ? 'You earned a body part!' : 'You already have this part.'}
+                                Correct!
+                                {result.awardedParts && result.awardedParts.length > 0 ? (
+                                    <div className="mt-2 text-sm font-normal">
+                                        You earned {result.awardedParts.length} body part{result.awardedParts.length > 1 ? 's' : ''}:
+                                        <ul className="mt-1 list-disc list-inside">
+                                            {result.awardedParts.map(bp => (
+                                                <li key={bp.id}>{bp.name} ({bp.rarity})</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                ) : (
+                                    <span> You already have all the rewards for this question.</span>
+                                )}
                             </div>
                         ) : (
                             <div className="text-red-500 font-bold mb-4">

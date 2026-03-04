@@ -9,9 +9,9 @@ services:
       - "4000:4000"
     env_file:
       - ./backend/.env
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
+    # volumes:
+    #   - ./backend:/app
+    #   - /app/node_modules
     command: node index.js
     restart: unless-stopped
 
@@ -20,7 +20,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "5173:5173"
+      - "5173:80"
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -28,3 +28,13 @@ services:
       backend:
         condition: service_started
     restart: unless-stopped
+  admin:
+        build:
+          context: ./admin
+          dockerfile: Dockerfile
+        ports:
+          - "5174:80"
+        depends_on:
+          backend:
+            condition: service_started
+        restart: unless-stopped

@@ -34,7 +34,7 @@ router.get('/:id', requireAuth, async (req, res) => {
             questions: {
                 include: {
                     options: true,
-                    bodyPart: true,
+                    bodyParts: { include: { bodyPart: true } },
                 },
             },
         },

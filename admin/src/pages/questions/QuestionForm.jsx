@@ -12,7 +12,7 @@ export default function QuestionForm() {
 
   const [formData, setFormData] = useState({
     trailId: '',
-    bodyPartId: '',
+    bodyPartIds: [],
     question: '',
     type: 'MCQ',
     options: [
@@ -45,7 +45,7 @@ export default function QuestionForm() {
         const questionData = await getQuestion(id);
         setFormData({
           trailId: questionData.trailId.toString(),
-          bodyPartId: questionData.bodyPartId?.toString() || '',
+          bodyPartIds: questionData.bodyParts?.map(qbp => qbp.bodyPartId.toString()) || [],
           question: questionData.question,
           type: questionData.type,
           options: questionData.options
@@ -72,7 +72,7 @@ export default function QuestionForm() {
     try {
       const data = {
         trailId: parseInt(formData.trailId),
-        bodyPartId: formData.bodyPartId ? parseInt(formData.bodyPartId) : null,
+        bodyPartIds: formData.bodyPartIds.map(id => parseInt(id)),
         question: formData.question,
         type: formData.type,
         options: formData.options.filter(opt => opt.description.trim() !== '')
@@ -140,15 +140,31 @@ export default function QuestionForm() {
             required
           />
 
-          <Select
-            label="Body Part Reward (Optional)"
-            value={formData.bodyPartId}
-            onChange={(e) => setFormData({ ...formData, bodyPartId: e.target.value })}
-            options={bodyParts.map(bp => ({
-              value: bp.id.toString(),
-              label: `${bp.forestFriend.name} - ${bp.name} (${bp.rarity})`
-            }))}
-          />
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Body Part Rewards (Optional)
+            </label>
+            <div className="max-h-48 overflow-y-auto border border-gray-300 rounded-md p-2">
+              {bodyParts.map(bp => (
+                <label key={bp.id} className="flex items-center gap-2 cursor-pointer py-1">
+                  <input
+                    type="checkbox"
+                    checked={formData.bodyPartIds.includes(bp.id.toString())}
+                    onChange={(e) => {
+                      const bpId = bp.id.toString();
+                      if (e.target.checked) {
+                        setFormData({ ...formData, bodyPartIds: [...formData.bodyPartIds, bpId] });
+                      } else {
+                        setFormData({ ...formData, bodyPartIds: formData.bodyPartIds.filter(id => id !== bpId) });
+                      }
+                    }}
+                    className="w-4 h-4 text-primary"
+                  />
+                  <span>{bp.forestFriend.name} - {bp.name} ({bp.rarity})</span>
+                </label>
+              ))}
+            </div>
+          </div>
 
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
