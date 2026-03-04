@@ -1,8 +1,18 @@
 const { PrismaClient } = require('@prisma/client');
+const QRCode = require('qrcode');
+const fs = require('fs');
+const path = require('path');
+
 const prisma = new PrismaClient();
 
 async function generateQRCodeData() {
     try {
+        // Create directory for QR codes
+        const qrCodesDir = path.join(__dirname, 'qr-codes');
+        if (!fs.existsSync(qrCodesDir)) {
+            fs.mkdirSync(qrCodesDir, { recursive: true });
+        }
+
         // Get all questions with options and related body parts
         const questions = await prisma.question.findMany({
             include: {
@@ -20,12 +30,15 @@ async function generateQRCodeData() {
             }
         });
 
-        console.log('\n=== QR CODES TO GENERATE ===\n');
+        console.log('\n=== GENERATING QR CODES ===\n');
 
+        let successCount = 0;
+        const failedQuestions = [];
 
-        questions.forEach(question => {
+        for (const question of questions) {
             console.log(`Question ID: ${question.id}`);
             console.log(`Trail: ${question.trail.name}`);
+
             if (question.bodyParts && question.bodyParts.length > 0) {
                 question.bodyParts.forEach(qbp => {
                     const bp = qbp.bodyPart;
@@ -34,6 +47,7 @@ async function generateQRCodeData() {
             } else {
                 console.log('For: None');
             }
+
             console.log(`Question: ${question.question}`);
             console.log(`Type: ${question.type}`);
 
@@ -53,15 +67,44 @@ async function generateQRCodeData() {
                 }
             }
 
-            console.log(`QR Code Content: ${question.id}`);
-            console.log(`QR Code URL: https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${question.id}`);
-            console.log('---\n');
-        });
+            // Generate QR code filename
+            const trailName = question.trail.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            const filename = `question_${question.id}_${trailName}.png`;
+            const filepath = path.join(qrCodesDir, filename);
 
-        console.log('INSTRUCTIONS:');
-        console.log('1. Visit each QR Code URL above to generate the QR code');
-        console.log('2. Save the QR code images');
-        console.log('3. Print them and place them along your trail');
+            try {
+                // Generate QR code and save to file
+                await QRCode.toFile(filepath, String(question.id), {
+                    width: 400,
+                    margin: 2,
+                    color: {
+                        dark: '#000000',
+                        light: '#FFFFFF'
+                    }
+                });
+
+                console.log(`✓ QR Code saved: ${filename}`);
+                successCount++;
+            } catch (err) {
+                console.error(`✗ Failed to generate QR code: ${err.message}`);
+                failedQuestions.push(question.id);
+            }
+
+            console.log('---\n');
+        }
+
+        console.log('\n=== SUMMARY ===');
+        console.log(`Total Questions: ${questions.length}`);
+        console.log(`Successfully Generated: ${successCount}`);
+        console.log(`Failed: ${failedQuestions.length}`);
+        if (failedQuestions.length > 0) {
+            console.log(`Failed Question IDs: ${failedQuestions.join(', ')}`);
+        }
+        console.log(`\nQR codes saved to: ${qrCodesDir}`);
+        console.log('\nINSTRUCTIONS:');
+        console.log('1. Open the qr-codes directory');
+        console.log('2. Print the QR code images');
+        console.log('3. Place them along your trail at the appropriate locations');
         console.log('4. Test by scanning with your app!');
 
     } catch (error) {
