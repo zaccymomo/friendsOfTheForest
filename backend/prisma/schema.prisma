@@ -44,6 +44,7 @@ model ForestFriend {
   id             Int                   @id @default(autoincrement())
   name           String
   imageUrl       String?
+  imageFULL      String?
   bodyParts      ForestFriendBodyPart[]
 }
 

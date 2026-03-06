@@ -17,6 +17,7 @@ const generalAssets = {
 const forestFriendAssets = {
   spider: {
     outline: `${S3_BASE_URL}/SpiderOutline.png`,
+    full: `${S3_BASE_URL}/spiderFULL.png`,
     legs: `${S3_BASE_URL}/SpiderLegs.png`,
     legsZoomed: `${S3_BASE_URL}/zoomed/spiderLegsZoomed.png`,
     head: `${S3_BASE_URL}/SpiderHead.png`,
@@ -26,6 +27,7 @@ const forestFriendAssets = {
   },
   otter: {
     outline: `${S3_BASE_URL}/OtterOutline.png`,
+    full: `${S3_BASE_URL}/otterFULL.png`,
     tail: `${S3_BASE_URL}/OtterTail.png`,
     tailZoomed: `${S3_BASE_URL}/zoomed/otterTailZoomed.png`,
     head: `${S3_BASE_URL}/OtterHead.png`,
@@ -35,6 +37,7 @@ const forestFriendAssets = {
   },
   lizard: {
     outline: `${S3_BASE_URL}/LizardOutline.png`,
+    full: `${S3_BASE_URL}/lizardFULL.png`,
     tail: `${S3_BASE_URL}/LizardTail.png`,
     tailZoomed: `${S3_BASE_URL}/zoomed/lizardTailZoomed.png`,
     head: `${S3_BASE_URL}/LizardHead.png`,
@@ -44,6 +47,7 @@ const forestFriendAssets = {
   },
   lion: {
     outline: `${S3_BASE_URL}/LionOutline.png`,
+    full: `${S3_BASE_URL}/lionFULL.png`,
     tail: `${S3_BASE_URL}/LionTail.png`,
     tailZoomed: `${S3_BASE_URL}/zoomed/lionTailZoomed.png`,
     head: `${S3_BASE_URL}/LionHead.png`,
@@ -53,6 +57,7 @@ const forestFriendAssets = {
   },
   koel: {
     outline: `${S3_BASE_URL}/KoelOutline.png`,
+    full: `${S3_BASE_URL}/koelFULL.png`,
     tail: `${S3_BASE_URL}/KoelTail.png`,
     tailZoomed: `${S3_BASE_URL}/zoomed/koelTailZoomed.png`,
     headBody: `${S3_BASE_URL}/KoelHeadBody.png`,
@@ -62,6 +67,7 @@ const forestFriendAssets = {
   },
   beetle: {
     outline: `${S3_BASE_URL}/BeetleOutline.png`,
+    full: `${S3_BASE_URL}/beetleFULL.png`,
     head: `${S3_BASE_URL}/BeetleHead.png`,
     headZoomed: `${S3_BASE_URL}/zoomed/beetleHeadZoomed.png`,
     body: `${S3_BASE_URL}/BeetleBody.png`,

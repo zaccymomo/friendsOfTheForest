@@ -50,11 +50,16 @@ async function main() {
         spider = await prisma.forestFriend.create({
             data: {
                 name: 'Spider',
-                imageUrl: forestFriendAssets.spider.outline
+                imageUrl: forestFriendAssets.spider.outline,
+                imageFULL: forestFriendAssets.spider.full,
             },
         });
         console.log('✓ Created forest friend: Spider');
     } else {
+        spider = await prisma.forestFriend.update({
+            where: { id: spider.id },
+            data: { imageFULL: forestFriendAssets.spider.full },
+        });
         console.log('✓ Forest friend already exists: Spider');
     }
 
@@ -65,11 +70,16 @@ async function main() {
         otter = await prisma.forestFriend.create({
             data: {
                 name: 'Otter',
-                imageUrl: forestFriendAssets.otter.outline
+                imageUrl: forestFriendAssets.otter.outline,
+                imageFULL: forestFriendAssets.otter.full,
             },
         });
         console.log('✓ Created forest friend: Otter');
     } else {
+        otter = await prisma.forestFriend.update({
+            where: { id: otter.id },
+            data: { imageFULL: forestFriendAssets.otter.full },
+        });
         console.log('✓ Forest friend already exists: Otter');
     }
 
@@ -80,11 +90,16 @@ async function main() {
         lizard = await prisma.forestFriend.create({
             data: {
                 name: 'Lizard',
-                imageUrl: forestFriendAssets.lizard.outline
+                imageUrl: forestFriendAssets.lizard.outline,
+                imageFULL: forestFriendAssets.lizard.full,
             },
         });
         console.log('✓ Created forest friend: Lizard');
     } else {
+        lizard = await prisma.forestFriend.update({
+            where: { id: lizard.id },
+            data: { imageFULL: forestFriendAssets.lizard.full },
+        });
         console.log('✓ Forest friend already exists: Lizard');
     }
 
@@ -95,11 +110,16 @@ async function main() {
         lion = await prisma.forestFriend.create({
             data: {
                 name: 'Lion',
-                imageUrl: forestFriendAssets.lion.outline
+                imageUrl: forestFriendAssets.lion.outline,
+                imageFULL: forestFriendAssets.lion.full,
             },
         });
         console.log('✓ Created forest friend: Lion');
     } else {
+        lion = await prisma.forestFriend.update({
+            where: { id: lion.id },
+            data: { imageFULL: forestFriendAssets.lion.full },
+        });
         console.log('✓ Forest friend already exists: Lion');
     }
 
@@ -110,11 +130,16 @@ async function main() {
         koel = await prisma.forestFriend.create({
             data: {
                 name: 'Koel',
-                imageUrl: forestFriendAssets.koel.outline
+                imageUrl: forestFriendAssets.koel.outline,
+                imageFULL: forestFriendAssets.koel.full,
             },
         });
         console.log('✓ Created forest friend: Koel');
     } else {
+        koel = await prisma.forestFriend.update({
+            where: { id: koel.id },
+            data: { imageFULL: forestFriendAssets.koel.full },
+        });
         console.log('✓ Forest friend already exists: Koel');
     }
 
@@ -125,11 +150,16 @@ async function main() {
         beetle = await prisma.forestFriend.create({
             data: {
                 name: 'Beetle',
-                imageUrl: forestFriendAssets.beetle.outline
+                imageUrl: forestFriendAssets.beetle.outline,
+                imageFULL: forestFriendAssets.beetle.full,
             },
         });
         console.log('✓ Created forest friend: Beetle\n');
     } else {
+        beetle = await prisma.forestFriend.update({
+            where: { id: beetle.id },
+            data: { imageFULL: forestFriendAssets.beetle.full },
+        });
         console.log('✓ Forest friend already exists: Beetle\n');
     }
 

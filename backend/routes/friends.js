@@ -27,6 +27,7 @@ router.get('/', requireAuth, async (req, res) => {
             id: friend.id,
             name: friend.name,
             imageUrl: friend.imageUrl,
+            imageFULL: friend.imageFULL,
             outlineUrl: forestFriendAssets[friend.name.toLowerCase()].outline,
             totalParts,
             foundParts,

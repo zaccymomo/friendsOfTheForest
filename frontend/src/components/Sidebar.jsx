@@ -80,9 +80,9 @@ export default function Sidebar({
                                         }}
                                         title={f.name}
                                     >
-                                        {f.imageUrl ? (
+                                        {f.imageFULL ? (
                                             <img
-                                                src={f.imageUrl}
+                                                src={f.imageFULL}
                                                 alt={f.name}
                                                 className="w-12 h-12 object-cover rounded-full"
                                             />

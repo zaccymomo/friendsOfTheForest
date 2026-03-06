@@ -35,10 +35,10 @@ export default function TopBar({ friends, onLogout }) {
 
   const selectedFriend = collectedFriends.find(f => f.id === selectedFriendId);
   const avatar = selectedFriend ? (
-    selectedFriend.imageUrl ? (
+    selectedFriend.imageFULL ? (
       <div className="w-10 h-10 rounded-full flex items-center justify-center border-2 border-brand overflow-hidden">
         <img
-          src={selectedFriend.imageUrl}
+          src={selectedFriend.imageFULL}
           alt={selectedFriend.name}
           className="w-full h-full object-cover"
         />
