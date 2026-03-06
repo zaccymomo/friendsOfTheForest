@@ -21,35 +21,43 @@ router.get('/:id', requireAuth, async (req, res) => {
         where: { id: trailId },
         include: {
             photos: true,
-            bodyParts: {
-                include: {
-                    bodyPart: {
-                        include: {
-                            userBodyParts: { where: { userId } },
-                            forestFriend: true,
-                        },
-                    },
-                },
-            },
             questions: {
                 include: {
                     options: true,
-                    bodyParts: { include: { bodyPart: true } },
+                    bodyParts: {
+                        include: {
+                            bodyPart: {
+                                include: {
+                                    userBodyParts: { where: { userId } },
+                                    forestFriend: true,
+                                },
+                            },
+                        },
+                    },
                 },
             },
         },
     });
     if (!trail) return res.status(404).json({ error: 'Trail not found' });
-    // Format body parts with found status
-    const bodyParts = trail.bodyParts.map(tb => ({
-        id: tb.bodyPart.id,
-        name: tb.bodyPart.name,
-        rarity: tb.bodyPart.rarity,
-        imageUrl: tb.bodyPart.imageUrl,
-        imageUrlZoomed: tb.bodyPart.imageUrlZoomed,
-        forestFriend: tb.bodyPart.forestFriend.name,
-        found: tb.bodyPart.userBodyParts.length > 0,
-    }));
+    // Collect all body parts from questions, deduplicated by id
+    const bodyPartMap = new Map();
+    for (const question of trail.questions) {
+        for (const qbp of question.bodyParts) {
+            const bp = qbp.bodyPart;
+            if (!bodyPartMap.has(bp.id)) {
+                bodyPartMap.set(bp.id, {
+                    id: bp.id,
+                    name: bp.name,
+                    rarity: bp.rarity,
+                    imageUrl: bp.imageUrl,
+                    imageUrlZoomed: bp.imageUrlZoomed,
+                    forestFriend: bp.forestFriend.name,
+                    found: bp.userBodyParts.length > 0,
+                });
+            }
+        }
+    }
+    const bodyParts = Array.from(bodyPartMap.values());
     res.json({
         id: trail.id,
         name: trail.name,

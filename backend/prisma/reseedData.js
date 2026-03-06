@@ -14,9 +14,6 @@ async function clearDatabase() {
     await prisma.trailPhoto.deleteMany({});
     console.log('✓ Cleared trail photos');
 
-    await prisma.trailBodyPart.deleteMany({});
-    console.log('✓ Cleared trail body parts');
-
     await prisma.userBodyPart.deleteMany({});
     console.log('✓ Cleared user body parts');
 

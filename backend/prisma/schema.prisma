@@ -57,7 +57,6 @@ model ForestFriendBodyPart {
   forestFriendId  Int
   questions       QuestionBodyPart[]
   userBodyParts   UserBodyPart[]
-  trailBodyParts  TrailBodyPart[]
 }
 
 model Trail {
@@ -68,7 +67,6 @@ model Trail {
   photos      TrailPhoto[]
   questions   Question[]
   userTrails  UserTrail[]
-  bodyParts   TrailBodyPart[]
 }
 
 model TrailPhoto {
@@ -122,10 +120,3 @@ model UserTrail {
   @@id([userId, trailId])
 }
 
-model TrailBodyPart {
-  trail     Trail                 @relation(fields: [trailId], references: [id])
-  trailId   Int
-  bodyPart  ForestFriendBodyPart  @relation(fields: [bodyPartId], references: [id])
-  bodyPartId Int
-  @@id([trailId, bodyPartId])
-}

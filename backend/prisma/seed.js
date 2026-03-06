@@ -475,37 +475,6 @@ async function main() {
     }
     console.log('✓ Ensured trail photos exist\n');
 
-    // Link body parts to trails (skip if already linked)
-    const existingTrailBodyParts = await prisma.trailBodyPart.count();
-    if (existingTrailBodyParts === 0) {
-        await prisma.trailBodyPart.createMany({
-            data: [
-                // Sentosa Coastal Trail: Spider (3 parts) + Otter (3 parts) + Lizard (3 parts)
-                { trailId: coastalTrail.id, bodyPartId: spiderLegs.id },
-                { trailId: coastalTrail.id, bodyPartId: spiderHead.id },
-                { trailId: coastalTrail.id, bodyPartId: spiderBody.id },
-                { trailId: coastalTrail.id, bodyPartId: otterTail.id },
-                { trailId: coastalTrail.id, bodyPartId: otterHead.id },
-                { trailId: coastalTrail.id, bodyPartId: otterBody.id },
-                { trailId: coastalTrail.id, bodyPartId: lizardTail.id },
-                { trailId: coastalTrail.id, bodyPartId: lizardHead.id },
-                { trailId: coastalTrail.id, bodyPartId: lizardBody.id },
-                // Sentosa Imbiah Trail: Lion (3 parts) + Koel (3 parts) + Beetle (3 parts)
-                { trailId: imbiahTrail.id, bodyPartId: lionTail.id },
-                { trailId: imbiahTrail.id, bodyPartId: lionHead.id },
-                { trailId: imbiahTrail.id, bodyPartId: lionBody.id },
-                { trailId: imbiahTrail.id, bodyPartId: koelTail.id },
-                { trailId: imbiahTrail.id, bodyPartId: koelHeadBody.id },
-                { trailId: imbiahTrail.id, bodyPartId: koelClaws.id },
-                { trailId: imbiahTrail.id, bodyPartId: beetleHead.id },
-                { trailId: imbiahTrail.id, bodyPartId: beetleBody.id },
-                { trailId: imbiahTrail.id, bodyPartId: beetleAntenna.id },
-            ],
-        });
-        console.log('✓ Linked body parts to trails\n');
-    } else {
-        console.log('✓ Body parts already linked to trails\n');
-    }
 
     // Create questions (check if exist first)
     const existingQuestions = await prisma.question.count();

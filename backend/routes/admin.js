@@ -251,7 +251,7 @@ router.get('/trails', async (req, res) => {
         const trails = await prisma.trail.findMany({
             include: {
                 photos: true,
-                _count: { select: { questions: true, bodyParts: true } }
+                _count: { select: { questions: true } }
             },
             orderBy: { id: 'asc' }
         });
@@ -270,9 +270,6 @@ router.get('/trails/:id', async (req, res) => {
                 photos: true,
                 questions: {
                     include: { options: true, bodyParts: { include: { bodyPart: { include: { forestFriend: true } } } } }
-                },
-                bodyParts: {
-                    include: { bodyPart: { include: { forestFriend: true } } }
                 }
             }
         });
@@ -383,36 +380,6 @@ router.delete('/trails/:trailId/photos/:photoId', async (req, res) => {
     }
 });
 
-// POST /admin/trails/:id/bodyparts - Link body part to trail
-router.post('/trails/:id/bodyparts', async (req, res) => {
-    try {
-        const trailId = parseInt(req.params.id);
-        const { bodyPartId } = req.body;
-        if (!bodyPartId) return res.status(400).json({ error: 'bodyPartId is required' });
-
-        const link = await prisma.trailBodyPart.create({
-            data: { trailId, bodyPartId: parseInt(bodyPartId) }
-        });
-        res.json(link);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// DELETE /admin/trails/:trailId/bodyparts/:bodyPartId - Unlink body part
-router.delete('/trails/:trailId/bodyparts/:bodyPartId', async (req, res) => {
-    try {
-        const trailId = parseInt(req.params.trailId);
-        const bodyPartId = parseInt(req.params.bodyPartId);
-
-        await prisma.trailBodyPart.delete({
-            where: { trailId_bodyPartId: { trailId, bodyPartId } }
-        });
-        res.json({ message: 'Body part unlinked' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
 
 // ============================================================================
 // QUESTIONS MANAGEMENT
