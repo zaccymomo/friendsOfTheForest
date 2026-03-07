@@ -14,6 +14,7 @@ export default function Register() {
         try {
             const { token } = await register(username, password);
             localStorage.setItem('token', token);
+            localStorage.setItem('username', username);
             setToken(token);
             navigate('/friends');
         } catch (err) {
