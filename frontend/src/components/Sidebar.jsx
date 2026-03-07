@@ -69,11 +69,11 @@ export default function Sidebar({
                         {/* Modal content - in front of the overlay */}
                         <div className="bg-white rounded-lg shadow-lg p-6 w-80 flex flex-col items-center relative z-50">
                             <h2 className="font-bold text-lg mb-4">Select Your Friend</h2>
-                            <div className="flex gap-4 mb-4">
+                            <div className="flex gap-4 mb-4 overflow-x-auto w-full pb-2 pt-4">
                                 {collectedFriends.map(f => (
                                     <button
                                         key={f.id}
-                                        className={`w-16 h-16 rounded-full flex items-center justify-center border-4 transition-all duration-200 ${selectedFriendId === f.id ? 'border-brand bg-green-200 scale-110' : 'border-gray-300 bg-gray-100 hover:border-brand'}`}
+                                        className={`flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center border-4 transition-all duration-200 ${selectedFriendId === f.id ? 'border-brand bg-green-200 scale-110' : 'border-gray-300 bg-gray-100 hover:border-brand'}`}
                                         onClick={() => {
                                             onSelectFriend(f.id);
                                             setModalOpen(false); // Close modal after selection
