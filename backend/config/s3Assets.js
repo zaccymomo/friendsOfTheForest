@@ -10,7 +10,7 @@ const trailAssets = {
 
 // General Assets
 const generalAssets = {
-  stickerBookBackground: `${S3_BASE_URL}/stickerBookBackground.png`,
+  stickerBookBackground: `${S3_BASE_URL}/stickerBookBackground.png?v=2`,
 };
 
 // Forest Friend Outlines and Body Parts
