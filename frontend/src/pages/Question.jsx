@@ -58,8 +58,8 @@ export default function Question({ refreshFriends }) {
                                         name="option"
                                         value={opt.id}
                                         checked={String(answer) === String(opt.id)}
-                                        onChange={() => setAnswer(opt.id)}
-                                        disabled={!!result}
+                                        onChange={() => { setAnswer(opt.id); setResult(null); }}
+                                        disabled={result?.correct}
                                     />
                                     <span>{opt.description}</span>
                                 </label>
@@ -70,11 +70,11 @@ export default function Question({ refreshFriends }) {
                             className="border p-2 rounded w-full"
                             placeholder="Your answer"
                             value={answer}
-                            onChange={e => setAnswer(e.target.value)}
-                            disabled={!!result}
+                            onChange={e => { setAnswer(e.target.value); setResult(null); }}
+                            disabled={result?.correct}
                         />
                     )}
-                    {!result && (
+                    {!result?.correct && (
                         <button
                             className="bg-warning text-brand font-bold py-2 rounded w-full"
                             type="submit"
@@ -83,30 +83,27 @@ export default function Question({ refreshFriends }) {
                             Submit
                         </button>
                     )}
+                    {result && !result.correct && (
+                        <p className="text-red-500 font-semibold text-sm">That's not quite right! Try again!</p>
+                    )}
                 </form>
-                {result && (
+                {result?.correct && (
                     <div className="mt-4 w-full text-center">
-                        {result.correct ? (
-                            <div className="text-green-600 font-bold mb-4">
-                                Correct!
-                                {result.awardedParts && result.awardedParts.length > 0 ? (
-                                    <div className="mt-2 text-sm font-normal">
-                                        You earned {result.awardedParts.length} body part{result.awardedParts.length > 1 ? 's' : ''}:
-                                        <ul className="mt-1 list-disc list-inside">
-                                            {result.awardedParts.map(bp => (
-                                                <li key={bp.id}>{bp.name} ({bp.rarity})</li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                ) : (
-                                    <span> You already have all the rewards for this question.</span>
-                                )}
-                            </div>
-                        ) : (
-                            <div className="text-red-500 font-bold mb-4">
-                                Wrong answer. Try again next time!
-                            </div>
-                        )}
+                        <div className="text-green-600 font-bold mb-4">
+                            Correct!
+                            {result.awardedParts && result.awardedParts.length > 0 ? (
+                                <div className="mt-2 text-sm font-normal">
+                                    You earned {result.awardedParts.length} body part{result.awardedParts.length > 1 ? 's' : ''}:
+                                    <ul className="mt-1 list-disc list-inside">
+                                        {result.awardedParts.map(bp => (
+                                            <li key={bp.id}>{bp.name} ({bp.rarity})</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            ) : (
+                                <span> You already have all the rewards for this question.</span>
+                            )}
+                        </div>
                         <button
                             className="px-6 py-3 font-bold bg-warning rounded-lg hover:bg-warning-dark transition-colors duration-200"
                             onClick={() => navigate(`/trails/${question.trailId}`)}
