@@ -5,7 +5,7 @@ const S3_BASE_URL = 'https://forestfriends.s3.ap-southeast-1.amazonaws.com';
 
 // Trail Assets
 const trailAssets = {
-  coastalTrailMap: `${S3_BASE_URL}/coastalTrailMap.png`,
+  coastalTrailMap: `${S3_BASE_URL}/coastalTrailMap.png?v=2`,
 };
 
 // General Assets
