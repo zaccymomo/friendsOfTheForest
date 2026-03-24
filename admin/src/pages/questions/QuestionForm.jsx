@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getQuestion, createQuestion, updateQuestion, getTrails, getBodyParts } from '../../api';
+import { getQuestion, createQuestion, updateQuestion, getTrails, getBodyParts, changeQuestionId } from '../../api';
 import Input from '../../components/Input';
 import Select from '../../components/Select';
 import Button from '../../components/Button';
@@ -26,6 +26,9 @@ export default function QuestionForm() {
   const [bodyParts, setBodyParts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [newIdValue, setNewIdValue] = useState('');
+  const [changeIdError, setChangeIdError] = useState('');
+  const [changeIdLoading, setChangeIdLoading] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -88,6 +91,24 @@ export default function QuestionForm() {
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to save question');
       setLoading(false);
+    }
+  };
+
+  const handleChangeId = async () => {
+    setChangeIdError('');
+    const parsed = parseInt(newIdValue);
+    if (!parsed || parsed <= 0) {
+      setChangeIdError('Please enter a valid positive integer');
+      return;
+    }
+    setChangeIdLoading(true);
+    try {
+      await changeQuestionId(parseInt(id), parsed);
+      alert(`Question ID changed from ${id} to ${parsed}`);
+      navigate(`/questions/${parsed}/edit`);
+    } catch (err) {
+      setChangeIdError(err.response?.data?.error || 'Failed to change question ID');
+      setChangeIdLoading(false);
     }
   };
 
@@ -238,6 +259,37 @@ export default function QuestionForm() {
           </div>
         </form>
       </div>
+
+      {isEdit && (
+        <div className="bg-white rounded-lg shadow p-6 mt-6 border border-amber-200">
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">Change Question ID</h2>
+          <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded p-3 mb-4">
+            Warning: Any printed QR codes for <strong>/question/{id}</strong> will stop working after changing the ID.
+            You must regenerate and reprint the QR code after this change.
+          </p>
+          <div className="flex items-end gap-3">
+            <div className="flex-1">
+              <Input
+                label="New Question ID"
+                type="number"
+                value={newIdValue}
+                onChange={(e) => setNewIdValue(e.target.value)}
+                placeholder="Enter new ID number"
+                min="1"
+              />
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleChangeId}
+              disabled={changeIdLoading}
+            >
+              {changeIdLoading ? 'Changing...' : 'Change ID'}
+            </Button>
+          </div>
+          {changeIdError && <p className="text-red-600 text-sm mt-2">{changeIdError}</p>}
+        </div>
+      )}
     </div>
   );
 }

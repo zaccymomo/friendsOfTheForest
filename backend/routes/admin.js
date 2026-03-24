@@ -502,6 +502,41 @@ router.delete('/questions/:id', async (req, res) => {
     }
 });
 
+// PUT /admin/questions/:id/change-id - Reassign question primary key
+router.put('/questions/:id/change-id', async (req, res) => {
+    const oldId = parseInt(req.params.id);
+    const newId = parseInt(req.body.newId);
+
+    if (!newId || isNaN(newId) || newId <= 0)
+        return res.status(400).json({ error: 'newId must be a positive integer' });
+    if (oldId === newId)
+        return res.status(400).json({ error: 'New ID is the same as the current ID' });
+
+    try {
+        const existing = await prisma.question.findUnique({ where: { id: oldId } });
+        if (!existing) return res.status(404).json({ error: 'Question not found' });
+
+        const conflict = await prisma.question.findUnique({ where: { id: newId } });
+        if (conflict) return res.status(409).json({ error: `Question with ID ${newId} already exists` });
+
+        await prisma.$transaction([
+            prisma.$executeRaw`INSERT INTO "Question" (id, "trailId", question, type) SELECT ${newId}, "trailId", question, type FROM "Question" WHERE id = ${oldId}`,
+            prisma.$executeRaw`UPDATE "Option" SET "questionId" = ${newId} WHERE "questionId" = ${oldId}`,
+            prisma.$executeRaw`UPDATE "QuestionBodyPart" SET "questionId" = ${newId} WHERE "questionId" = ${oldId}`,
+            prisma.$executeRaw`DELETE FROM "Question" WHERE id = ${oldId}`,
+            prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Question"', 'id'), (SELECT MAX(id) FROM "Question"))`,
+        ]);
+
+        const updated = await prisma.question.findUnique({
+            where: { id: newId },
+            include: { trail: true, options: true, bodyParts: { include: { bodyPart: { include: { forestFriend: true } } } } }
+        });
+        res.json(updated);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // ============================================================================
 // USER MANAGEMENT
 // ============================================================================

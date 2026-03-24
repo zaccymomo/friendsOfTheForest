@@ -151,6 +151,11 @@ export async function deleteQuestion(id) {
     return res.data;
 }
 
+export async function changeQuestionId(oldId, newId) {
+    const res = await axios.put(`${API_BASE}/admin/questions/${oldId}/change-id`, { newId }, { headers: authHeaders() });
+    return res.data;
+}
+
 // Users
 export async function getUsers() {
     const res = await axios.get(`${API_BASE}/admin/users`, { headers: authHeaders() });
