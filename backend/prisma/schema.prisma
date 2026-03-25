@@ -38,6 +38,7 @@ model User {
   updatedAt     DateTime           @updatedAt
   bodyParts     UserBodyPart[]
   trails        UserTrail[]
+  userZones     UserZone[]
 }
 
 model ForestFriend {
@@ -77,6 +78,13 @@ model TrailPhoto {
   photoUrl String
 }
 
+model Zone {
+  id        Int        @id
+  narrative String
+  questions Question[]
+  userZones UserZone[]
+}
+
 model Question {
   id            Int                @id @default(autoincrement())
   trail         Trail              @relation(fields: [trailId], references: [id], onDelete: Cascade)
@@ -85,6 +93,8 @@ model Question {
   type          QuestionType
   options       Option[]
   bodyParts     QuestionBodyPart[]
+  zone          Zone?              @relation(fields: [zoneId], references: [id])
+  zoneId        Int?
 }
 
 model Option {
@@ -119,5 +129,14 @@ model UserTrail {
   trailId  Int
   startedAt DateTime @default(now())
   @@id([userId, trailId])
+}
+
+model UserZone {
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  zone      Zone     @relation(fields: [zoneId], references: [id])
+  zoneId    Int
+  visitedAt DateTime @default(now())
+  @@id([userId, zoneId])
 }
 
