@@ -33,7 +33,7 @@ router.post('/:id/answer', requireAuth, async (req, res) => {
     const { answer } = req.body;
     const question = await prisma.question.findUnique({
         where: { id: questionId },
-        include: { options: true, bodyParts: { include: { bodyPart: true } } },
+        include: { options: true, bodyParts: { include: { bodyPart: { include: { forestFriend: true } } } } },
     });
     if (!question) return res.status(404).json({ error: 'Question not found' });
     let correct = false;

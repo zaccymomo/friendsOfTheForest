@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getQuestion, answerQuestion, visitZone } from '../api';
+import PopModal from '../components/PopModal';
+
+const rarityColors = {
+    COMMON: 'border-black',
+    RARE: 'border-purple-500',
+    LEGENDARY: 'border-yellow-400',
+};
 
 export default function Question({ refreshFriends }) {
     const { id } = useParams();
@@ -37,7 +44,6 @@ export default function Question({ refreshFriends }) {
             const res = await answerQuestion(id, question.type === 'MCQ' ? Number(answer) : answer);
             setResult(res);
 
-            // If a body part was awarded, refresh the friends data
             if (res.awarded && refreshFriends) {
                 refreshFriends();
             }
@@ -54,16 +60,9 @@ export default function Question({ refreshFriends }) {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-background">
-            {showZoneModal && question?.zone && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-                <div className="bg-white rounded-xl shadow-lg w-full max-w-sm mx-4 p-6 flex flex-col items-center relative animate-zone-pop">
-                    <button
-                        className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl font-bold leading-none"
-                        onClick={handleZoneDismiss}
-                        aria-label="Close"
-                    >
-                        ×
-                    </button>
+            {/* Zone narrative modal */}
+            {showZoneModal && question.zone && (
+                <PopModal onClose={handleZoneDismiss}>
                     <h2 className="text-lg font-bold text-brand mb-3">You've just found a new zone!</h2>
                     <p className="text-center text-gray-800 mb-6">{question.zone.narrative}</p>
                     <button
@@ -72,10 +71,53 @@ export default function Question({ refreshFriends }) {
                     >
                         Let's do it!
                     </button>
-                </div>
-            </div>
-        )}
-        <div className="bg-white p-6 rounded shadow w-full max-w-md flex flex-col items-center">
+                </PopModal>
+            )}
+
+            {/* Correct answer modal */}
+            {result?.correct && (
+                <PopModal>
+                    <h2 className="text-xl font-bold text-brand mb-2">Woohoo!</h2>
+                    {result.awardedParts && result.awardedParts.length > 0 ? (
+                        <>
+                            <p className="text-center text-gray-700 mb-4">That's spot on! You just obtained:</p>
+                            <div className="flex flex-wrap justify-evenly gap-y-2 w-full mb-6">
+                                {result.awardedParts.map(bp => (
+                                    <div
+                                        key={bp.id}
+                                        className={`flex flex-col items-center justify-center border-2 ${rarityColors[bp.rarity]} rounded p-2 bg-green-100 w-[30%]`}
+                                    >
+                                        <span className="text-[10px] font-bold mb-1 uppercase tracking-wide text-gray-700">{bp.rarity}</span>
+                                        {bp.imageUrlZoomed ? (
+                                            <img
+                                                src={bp.imageUrlZoomed}
+                                                alt={bp.name}
+                                                className="w-full h-12 object-contain mb-1"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-12 flex items-center justify-center bg-gray-200 rounded mb-1">
+                                                <span className="text-[8px] text-gray-500 text-center px-1">{bp.name}</span>
+                                            </div>
+                                        )}
+                                        <span className="text-xs font-semibold mb-1">{bp.name}</span>
+                                        <span className="text-[10px] text-gray-500">{bp.forestFriend?.name}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </>
+                    ) : (
+                        <p className="text-center text-gray-700 mb-6">You already have all the rewards for this question.</p>
+                    )}
+                    <button
+                        className="px-6 py-3 font-bold bg-warning rounded-lg hover:bg-warning-dark transition-colors duration-200"
+                        onClick={() => navigate(`/trails/${question.trailId}`)}
+                    >
+                        ← Back to Trail
+                    </button>
+                </PopModal>
+            )}
+
+            <div className="bg-white p-6 rounded shadow w-full max-w-md flex flex-col items-center">
                 <h1 className="text-xl font-bold mb-4 text-brand">Question</h1>
                 <div className="mb-4 text-center font-semibold">{question.question}</div>
                 <form onSubmit={handleSubmit} className="w-full flex flex-col items-center gap-4">
@@ -89,7 +131,6 @@ export default function Question({ refreshFriends }) {
                                         value={opt.id}
                                         checked={String(answer) === String(opt.id)}
                                         onChange={() => { setAnswer(opt.id); setResult(null); }}
-                                        disabled={result?.correct}
                                     />
                                     <span>{opt.description}</span>
                                 </label>
@@ -101,48 +142,20 @@ export default function Question({ refreshFriends }) {
                             placeholder="Your answer"
                             value={answer}
                             onChange={e => { setAnswer(e.target.value); setResult(null); }}
-                            disabled={result?.correct}
                         />
                     )}
-                    {!result?.correct && (
-                        <button
-                            className="bg-warning text-brand font-bold py-2 rounded w-full"
-                            type="submit"
-                            disabled={submitting || !answer}
-                        >
-                            Submit
-                        </button>
-                    )}
+                    <button
+                        className="bg-warning text-brand font-bold py-2 rounded w-full"
+                        type="submit"
+                        disabled={submitting || !answer}
+                    >
+                        Submit
+                    </button>
                     {result && !result.correct && (
                         <p className="text-red-500 font-semibold text-sm">That's not quite right! Try again!</p>
                     )}
                 </form>
-                {result?.correct && (
-                    <div className="mt-4 w-full text-center">
-                        <div className="text-green-600 font-bold mb-4">
-                            Correct!
-                            {result.awardedParts && result.awardedParts.length > 0 ? (
-                                <div className="mt-2 text-sm font-normal">
-                                    You earned {result.awardedParts.length} body part{result.awardedParts.length > 1 ? 's' : ''}:
-                                    <ul className="mt-1 list-disc list-inside">
-                                        {result.awardedParts.map(bp => (
-                                            <li key={bp.id}>{bp.name} ({bp.rarity})</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            ) : (
-                                <span> You already have all the rewards for this question.</span>
-                            )}
-                        </div>
-                        <button
-                            className="px-6 py-3 font-bold bg-warning rounded-lg hover:bg-warning-dark transition-colors duration-200"
-                            onClick={() => navigate(`/trails/${question.trailId}`)}
-                        >
-                            ← Return to Trail
-                        </button>
-                    </div>
-                )}
             </div>
         </div>
     );
-} 
+}
