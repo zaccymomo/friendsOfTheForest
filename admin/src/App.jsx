@@ -18,6 +18,10 @@ import QuestionForm from './pages/questions/QuestionForm';
 import FriendList from './pages/friends/FriendList';
 import FriendForm from './pages/friends/FriendForm';
 
+// Zone pages
+import ZoneList from './pages/zones/ZoneList';
+import ZoneForm from './pages/zones/ZoneForm';
+
 // User pages
 import UserList from './pages/users/UserList';
 import UserDetail from './pages/users/UserDetail';
@@ -52,6 +56,11 @@ export default function App() {
           <Route path="friends" element={<FriendList />} />
           <Route path="friends/new" element={<FriendForm />} />
           <Route path="friends/:id/edit" element={<FriendForm />} />
+
+          {/* Zone routes */}
+          <Route path="zones" element={<ZoneList />} />
+          <Route path="zones/new" element={<ZoneForm />} />
+          <Route path="zones/:id/edit" element={<ZoneForm />} />
 
           {/* User routes */}
           <Route path="users" element={<UserList />} />

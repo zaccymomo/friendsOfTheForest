@@ -385,11 +385,92 @@ router.delete('/trails/:trailId/photos/:photoId', async (req, res) => {
 // ZONES MANAGEMENT
 // ============================================================================
 
-// GET /admin/zones - List all zones
+// GET /admin/zones - List all zones with question count
 router.get('/zones', async (req, res) => {
     try {
-        const zones = await prisma.zone.findMany({ orderBy: { id: 'asc' } });
+        const zones = await prisma.zone.findMany({
+            orderBy: { id: 'asc' },
+            include: { _count: { select: { questions: true } } }
+        });
         res.json(zones);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// GET /admin/zones/:id - Get single zone with its questions
+router.get('/zones/:id', async (req, res) => {
+    try {
+        const zone = await prisma.zone.findUnique({
+            where: { id: parseInt(req.params.id) },
+            include: { questions: { include: { trail: true } } }
+        });
+        if (!zone) return res.status(404).json({ error: 'Zone not found' });
+        res.json(zone);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// POST /admin/zones - Create a new zone
+router.post('/zones', async (req, res) => {
+    try {
+        const { id, narrative } = req.body;
+        if (!id || !narrative) return res.status(400).json({ error: 'id and narrative are required' });
+        const zone = await prisma.zone.create({ data: { id: parseInt(id), narrative } });
+        res.json(zone);
+    } catch (error) {
+        if (error.code === 'P2002') return res.status(400).json({ error: 'A zone with that ID already exists' });
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// PUT /admin/zones/:id - Update zone narrative
+router.put('/zones/:id', async (req, res) => {
+    try {
+        const { narrative } = req.body;
+        if (!narrative) return res.status(400).json({ error: 'narrative is required' });
+        const zone = await prisma.zone.update({
+            where: { id: parseInt(req.params.id) },
+            data: { narrative }
+        });
+        res.json(zone);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// PUT /admin/zones/:id/change-id - Reassign zone ID
+router.put('/zones/:id/change-id', async (req, res) => {
+    try {
+        const oldId = parseInt(req.params.id);
+        const newId = parseInt(req.body.newId);
+        if (!newId || newId <= 0) return res.status(400).json({ error: 'Invalid new ID' });
+
+        const existing = await prisma.zone.findUnique({ where: { id: newId } });
+        if (existing) return res.status(400).json({ error: 'A zone with that ID already exists' });
+
+        await prisma.$transaction([
+            prisma.$executeRaw`INSERT INTO "Zone" (id, narrative) SELECT ${newId}, narrative FROM "Zone" WHERE id = ${oldId}`,
+            prisma.$executeRaw`UPDATE "Question" SET "zoneId" = ${newId} WHERE "zoneId" = ${oldId}`,
+            prisma.$executeRaw`UPDATE "UserZone" SET "zoneId" = ${newId} WHERE "zoneId" = ${oldId}`,
+            prisma.$executeRaw`DELETE FROM "Zone" WHERE id = ${oldId}`,
+        ]);
+
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// DELETE /admin/zones/:id - Delete zone (unlinks questions first)
+router.delete('/zones/:id', async (req, res) => {
+    try {
+        const zoneId = parseInt(req.params.id);
+        await prisma.question.updateMany({ where: { zoneId }, data: { zoneId: null } });
+        await prisma.userZone.deleteMany({ where: { zoneId } });
+        await prisma.zone.delete({ where: { id: zoneId } });
+        res.json({ success: true });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -405,6 +486,7 @@ router.get('/questions', async (req, res) => {
         const questions = await prisma.question.findMany({
             include: {
                 trail: true,
+                zone: true,
                 bodyParts: { include: { bodyPart: { include: { forestFriend: true } } } },
                 options: true
             },

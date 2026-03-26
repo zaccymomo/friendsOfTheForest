@@ -131,6 +131,31 @@ export async function getZones() {
     return res.data;
 }
 
+export async function getZone(id) {
+    const res = await axios.get(`${API_BASE}/admin/zones/${id}`, { headers: authHeaders() });
+    return res.data;
+}
+
+export async function createZone(data) {
+    const res = await axios.post(`${API_BASE}/admin/zones`, data, { headers: authHeaders() });
+    return res.data;
+}
+
+export async function updateZone(id, data) {
+    const res = await axios.put(`${API_BASE}/admin/zones/${id}`, data, { headers: authHeaders() });
+    return res.data;
+}
+
+export async function changeZoneId(oldId, newId) {
+    const res = await axios.put(`${API_BASE}/admin/zones/${oldId}/change-id`, { newId }, { headers: authHeaders() });
+    return res.data;
+}
+
+export async function deleteZone(id) {
+    const res = await axios.delete(`${API_BASE}/admin/zones/${id}`, { headers: authHeaders() });
+    return res.data;
+}
+
 // Questions
 export async function getQuestions() {
     const res = await axios.get(`${API_BASE}/admin/questions`, { headers: authHeaders() });

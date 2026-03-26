@@ -62,6 +62,12 @@ export default function AdminLayout() {
               Forest Friends
             </Link>
             <Link
+              to="/zones"
+              className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-700 hover:bg-gray-100"
+            >
+              Zones
+            </Link>
+            <Link
               to="/users"
               className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-700 hover:bg-gray-100"
             >
