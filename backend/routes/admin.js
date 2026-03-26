@@ -382,6 +382,20 @@ router.delete('/trails/:trailId/photos/:photoId', async (req, res) => {
 
 
 // ============================================================================
+// ZONES MANAGEMENT
+// ============================================================================
+
+// GET /admin/zones - List all zones
+router.get('/zones', async (req, res) => {
+    try {
+        const zones = await prisma.zone.findMany({ orderBy: { id: 'asc' } });
+        res.json(zones);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ============================================================================
 // QUESTIONS MANAGEMENT
 // ============================================================================
 
@@ -423,7 +437,7 @@ router.get('/questions/:id', async (req, res) => {
 // POST /admin/questions - Create question with options
 router.post('/questions', async (req, res) => {
     try {
-        const { trailId, bodyPartIds, question, type, options } = req.body;
+        const { trailId, zoneId, bodyPartIds, question, type, options } = req.body;
         if (!trailId || !question || !type || !options) {
             return res.status(400).json({ error: 'trailId, question, type, and options are required' });
         }
@@ -431,6 +445,7 @@ router.post('/questions', async (req, res) => {
         const newQuestion = await prisma.question.create({
             data: {
                 trailId: parseInt(trailId),
+                zoneId: zoneId ? parseInt(zoneId) : null,
                 question,
                 type,
                 options: {
@@ -443,7 +458,7 @@ router.post('/questions', async (req, res) => {
                     create: (bodyPartIds || []).map(id => ({ bodyPartId: parseInt(id) }))
                 }
             },
-            include: { options: true, bodyParts: { include: { bodyPart: { include: { forestFriend: true } } } }, trail: true }
+            include: { options: true, bodyParts: { include: { bodyPart: { include: { forestFriend: true } } } }, trail: true, zone: true }
         });
         res.json(newQuestion);
     } catch (error) {
@@ -454,7 +469,7 @@ router.post('/questions', async (req, res) => {
 // PUT /admin/questions/:id - Update question
 router.put('/questions/:id', async (req, res) => {
     try {
-        const { trailId, bodyPartIds, question, type, options } = req.body;
+        const { trailId, zoneId, bodyPartIds, question, type, options } = req.body;
         const id = parseInt(req.params.id);
 
         const existing = await prisma.question.findUnique({ where: { id } });
@@ -468,6 +483,7 @@ router.put('/questions/:id', async (req, res) => {
             where: { id },
             data: {
                 trailId: parseInt(trailId),
+                zoneId: zoneId ? parseInt(zoneId) : null,
                 question,
                 type,
                 options: {
@@ -480,7 +496,7 @@ router.put('/questions/:id', async (req, res) => {
                     create: (bodyPartIds || []).map(id => ({ bodyPartId: parseInt(id) }))
                 }
             },
-            include: { options: true, bodyParts: { include: { bodyPart: { include: { forestFriend: true } } } }, trail: true }
+            include: { options: true, bodyParts: { include: { bodyPart: { include: { forestFriend: true } } } }, trail: true, zone: true }
         });
         res.json(updated);
     } catch (error) {
@@ -520,7 +536,7 @@ router.put('/questions/:id/change-id', async (req, res) => {
         if (conflict) return res.status(409).json({ error: `Question with ID ${newId} already exists` });
 
         await prisma.$transaction([
-            prisma.$executeRaw`INSERT INTO "Question" (id, "trailId", question, type) SELECT ${newId}, "trailId", question, type FROM "Question" WHERE id = ${oldId}`,
+            prisma.$executeRaw`INSERT INTO "Question" (id, "trailId", "zoneId", question, type) SELECT ${newId}, "trailId", "zoneId", question, type FROM "Question" WHERE id = ${oldId}`,
             prisma.$executeRaw`UPDATE "Option" SET "questionId" = ${newId} WHERE "questionId" = ${oldId}`,
             prisma.$executeRaw`UPDATE "QuestionBodyPart" SET "questionId" = ${newId} WHERE "questionId" = ${oldId}`,
             prisma.$executeRaw`DELETE FROM "Question" WHERE id = ${oldId}`,

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getQuestion, createQuestion, updateQuestion, getTrails, getBodyParts, changeQuestionId } from '../../api';
+import { getQuestion, createQuestion, updateQuestion, getTrails, getBodyParts, getZones, changeQuestionId } from '../../api';
 import Input from '../../components/Input';
 import Select from '../../components/Select';
 import Button from '../../components/Button';
@@ -12,6 +12,7 @@ export default function QuestionForm() {
 
   const [formData, setFormData] = useState({
     trailId: '',
+    zoneId: '',
     bodyPartIds: [],
     question: '',
     type: 'MCQ',
@@ -23,6 +24,7 @@ export default function QuestionForm() {
     ]
   });
   const [trails, setTrails] = useState([]);
+  const [zones, setZones] = useState([]);
   const [bodyParts, setBodyParts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -36,18 +38,21 @@ export default function QuestionForm() {
 
   const loadData = async () => {
     try {
-      const [trailsData, bodyPartsData] = await Promise.all([
+      const [trailsData, zonesData, bodyPartsData] = await Promise.all([
         getTrails(),
+        getZones(),
         getBodyParts()
       ]);
 
       setTrails(trailsData);
+      setZones(zonesData);
       setBodyParts(bodyPartsData);
 
       if (isEdit) {
         const questionData = await getQuestion(id);
         setFormData({
           trailId: questionData.trailId.toString(),
+          zoneId: questionData.zoneId?.toString() || '',
           bodyPartIds: questionData.bodyParts?.map(qbp => qbp.bodyPartId.toString()) || [],
           question: questionData.question,
           type: questionData.type,
@@ -75,6 +80,7 @@ export default function QuestionForm() {
     try {
       const data = {
         trailId: parseInt(formData.trailId),
+        zoneId: formData.zoneId ? parseInt(formData.zoneId) : null,
         bodyPartIds: formData.bodyPartIds.map(id => parseInt(id)),
         question: formData.question,
         type: formData.type,
@@ -159,6 +165,16 @@ export default function QuestionForm() {
             onChange={(e) => setFormData({ ...formData, trailId: e.target.value })}
             options={trails.map(t => ({ value: t.id.toString(), label: t.name }))}
             required
+          />
+
+          <Select
+            label="Zone (Optional)"
+            value={formData.zoneId}
+            onChange={(e) => setFormData({ ...formData, zoneId: e.target.value })}
+            options={[
+              { value: '', label: 'No zone' },
+              ...zones.map(z => ({ value: z.id.toString(), label: `Zone ${z.id}` }))
+            ]}
           />
 
           <div className="mb-4">

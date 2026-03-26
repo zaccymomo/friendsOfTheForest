@@ -125,6 +125,12 @@ export async function unlinkBodyPartFromTrail(trailId, bodyPartId) {
     return res.data;
 }
 
+// Zones
+export async function getZones() {
+    const res = await axios.get(`${API_BASE}/admin/zones`, { headers: authHeaders() });
+    return res.data;
+}
+
 // Questions
 export async function getQuestions() {
     const res = await axios.get(`${API_BASE}/admin/questions`, { headers: authHeaders() });
