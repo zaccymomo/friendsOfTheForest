@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-export default function NavButton({ to, children, className = '' }) {
+export default function NavButton({ to, children, className = '', id }) {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -15,6 +15,7 @@ export default function NavButton({ to, children, className = '' }) {
 
     return (
         <button
+            id={id}
             className={buttonClasses}
             onClick={() => navigate(to)}
         >

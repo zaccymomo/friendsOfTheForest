@@ -55,7 +55,7 @@ export default function TopBar({ friends, onLogout }) {
       <div className="flex items-center justify-between px-4 py-2 border-b border-brand sticky top-0 z-10" style={{backgroundColor: '#F4EDD2'}}>
         <div className="flex gap-2">
           <button onClick={() => setSidebarOpen(true)}>{avatar}</button>
-          <NavButton to="/friends">
+          <NavButton to="/friends" id="friends-tab">
             Friends
           </NavButton>
           <NavButton to="/trails">

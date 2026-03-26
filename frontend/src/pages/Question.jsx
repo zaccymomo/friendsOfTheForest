@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getQuestion, answerQuestion, visitZone } from '../api';
 import PopModal from '../components/PopModal';
@@ -19,6 +19,44 @@ export default function Question({ refreshFriends }) {
     const [result, setResult] = useState(null);
     const [submitting, setSubmitting] = useState(false);
     const [showZoneModal, setShowZoneModal] = useState(false);
+    const [flyingParts, setFlyingParts] = useState([]);
+    const imgRefs = useRef({});
+    const flyPartRefs = useRef({});
+
+    useEffect(() => {
+        if (!flyingParts.length) return;
+        flyingParts.forEach((part) => {
+            const el = flyPartRefs.current[part.id];
+            if (!el) return;
+            const dx = part.targetX - part.startX;
+            const dy = part.targetY - part.startY;
+            setTimeout(() => {
+                el.animate([
+                    {
+                        transform: 'translate(-50%, -50%) scale(1)',
+                        opacity: 1,
+                        easing: 'ease-out',
+                    },
+                    {
+                        transform: 'translate(calc(-50% + -50px), calc(-50% + 100px)) scale(0.75)',
+                        opacity: 1,
+                        offset: 0.25,
+                        easing: 'ease-in-out',
+                    },
+                    {
+                        transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy + 120}px)) scale(0.4)`,
+                        opacity: 0.7,
+                        offset: 0.65,
+                        easing: 'ease-in',
+                    },
+                    {
+                        transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.15)`,
+                        opacity: 0,
+                    },
+                ], { duration: 900, fill: 'forwards' });
+            }, part.delay);
+        });
+    }, [flyingParts]);
 
     useEffect(() => {
         setLoading(true);
@@ -30,6 +68,50 @@ export default function Question({ refreshFriends }) {
             .catch(() => setError('Failed to load question'))
             .finally(() => setLoading(false));
     }, [id]);
+
+    const handleBackToTrail = () => {
+        const friendsTab = document.getElementById('friends-tab');
+        if (!friendsTab || !result?.awardedParts?.length) {
+            navigate(`/trails/${question.trailId}`);
+            return;
+        }
+        const tabRect = friendsTab.getBoundingClientRect();
+        const targetX = tabRect.left + tabRect.width / 2;
+        const targetY = tabRect.top + tabRect.height / 2;
+
+        const parts = result.awardedParts
+            .filter(bp => imgRefs.current[bp.id])
+            .map((bp, i) => {
+                const rect = imgRefs.current[bp.id].getBoundingClientRect();
+                return {
+                    id: bp.id,
+                    src: bp.imageUrlZoomed || null,
+                    name: bp.name,
+                    startX: rect.left + rect.width / 2,
+                    startY: rect.top + rect.height / 2,
+                    targetX,
+                    targetY,
+                    delay: i * 80,
+                };
+            });
+
+        setFlyingParts(parts);
+        setResult(null);
+
+        setTimeout(() => {
+            friendsTab.animate([
+                { transform: 'scale(1)' },
+                { transform: 'scale(1.45)' },
+                { transform: 'scale(0.85)' },
+                { transform: 'scale(1.15)' },
+                { transform: 'scale(1)' },
+            ], { duration: 400, easing: 'ease-out' });
+        }, 870);
+
+        setTimeout(() => {
+            navigate(`/trails/${question.trailId}`);
+        }, 1300);
+    };
 
     const handleZoneDismiss = async () => {
         setShowZoneModal(false);
@@ -90,12 +172,16 @@ export default function Question({ refreshFriends }) {
                                         <span className="text-[10px] font-bold mb-1 uppercase tracking-wide text-gray-700">{bp.rarity}</span>
                                         {bp.imageUrlZoomed ? (
                                             <img
+                                                ref={el => imgRefs.current[bp.id] = el}
                                                 src={bp.imageUrlZoomed}
                                                 alt={bp.name}
                                                 className="w-full h-12 object-contain mb-1"
                                             />
                                         ) : (
-                                            <div className="w-full h-12 flex items-center justify-center bg-gray-200 rounded mb-1">
+                                            <div
+                                                ref={el => imgRefs.current[bp.id] = el}
+                                                className="w-full h-12 flex items-center justify-center bg-gray-200 rounded mb-1"
+                                            >
                                                 <span className="text-[8px] text-gray-500 text-center px-1">{bp.name}</span>
                                             </div>
                                         )}
@@ -110,12 +196,36 @@ export default function Question({ refreshFriends }) {
                     )}
                     <button
                         className="px-6 py-3 font-bold bg-warning rounded-lg hover:bg-warning-dark transition-colors duration-200"
-                        onClick={() => navigate(`/trails/${question.trailId}`)}
+                        onClick={handleBackToTrail}
                     >
                         ← Back to Trail
                     </button>
                 </PopModal>
             )}
+
+            {/* Flying body part clones */}
+            {flyingParts.map((part) => (
+                <div
+                    key={part.id}
+                    ref={el => flyPartRefs.current[part.id] = el}
+                    style={{
+                        position: 'fixed',
+                        left: part.startX,
+                        top: part.startY,
+                        transform: 'translate(-50%, -50%)',
+                        zIndex: 9999,
+                        pointerEvents: 'none',
+                        width: 48,
+                        height: 48,
+                    }}
+                >
+                    {part.src ? (
+                        <img src={part.src} alt={part.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    ) : (
+                        <div style={{ width: '100%', height: '100%', background: '#d1d5db', borderRadius: 4 }} />
+                    )}
+                </div>
+            ))}
 
             <div className="bg-white p-6 rounded shadow w-full max-w-md flex flex-col items-center">
                 <h1 className="text-xl font-bold mb-4 text-brand">Question</h1>
