@@ -7,13 +7,23 @@ const prisma = new PrismaClient();
 
 // GET /questions/:id - fetch question by ID
 router.get('/:id', requireAuth, async (req, res) => {
+    const userId = req.user.userId;
     const questionId = parseInt(req.params.id);
     const question = await prisma.question.findUnique({
         where: { id: questionId },
-        include: { options: true, bodyParts: { include: { bodyPart: true } } },
+        include: { options: true, bodyParts: { include: { bodyPart: true } }, zone: true },
     });
     if (!question) return res.status(404).json({ error: 'Question not found' });
-    res.json(question);
+
+    let zoneVisited = true;
+    if (question.zone) {
+        const existing = await prisma.userZone.findUnique({
+            where: { userId_zoneId: { userId, zoneId: question.zone.id } },
+        });
+        zoneVisited = !!existing;
+    }
+
+    res.json({ ...question, zoneVisited });
 });
 
 // POST /questions/:id/answer - submit answer, validate, award body parts if correct

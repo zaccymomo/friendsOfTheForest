@@ -58,4 +58,9 @@ export async function updateProfile({ username, password }) {
     return res.data;
 }
 
+export async function visitZone(zoneId) {
+    const res = await axios.post(`${API_BASE}/zones/${zoneId}/visit`, {}, { headers: authHeaders() });
+    return res.data;
+}
+
 // Add more API helpers as needed 

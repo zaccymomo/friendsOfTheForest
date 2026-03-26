@@ -566,21 +566,14 @@ This will:
 
 ### Create New Migration
 
-After modifying `backend/prisma/schema.prisma`:
+After modifying `backend/prisma/schema.prisma`, with your `DATABASE_URL` pointing at the **dev branch**:
 
-**With Docker:**
 ```bash
-# Create the migration file
-docker-compose exec backend npx prisma migrate dev --name description_of_changes
-
-# The migration will automatically run on next container restart
-docker-compose restart backend
-```
-
-**Manual Setup:**
-```bash
+cd backend
 npm exec prisma migrate dev --name description_of_changes
 ```
+
+This generates a migration file in `backend/prisma/migrations/` and applies it to the dev database. **Commit the migration file** — Railway uses it to update production automatically on the next deploy.
 
 ### Seed Database
 
@@ -610,52 +603,75 @@ npm run reseed
 
 ## Schema Changes & Migrations
 
-**IMPORTANT:** The database is hosted on NeonDB (cloud PostgreSQL), not in Docker. Restarting containers does NOT reset the database.
+**IMPORTANT:** The database is hosted on NeonDB (cloud PostgreSQL) with two separate branches:
+- **`main` (production)** — used by the live Railway app. Never run `migrate dev` against this.
+- **`development`** — used for local development. All schema changes happen here first.
+
+### NeonDB Branch Setup
+
+Your `backend/.env` `DATABASE_URL` must point at the **development branch** connection string. The Railway backend service must use the **production branch** connection string (set in Railway dashboard → Variables).
 
 ### Development Workflow (Making Schema Changes)
 
-1. **Modify the schema:**
-   ```bash
-   # Edit backend/prisma/schema.prisma
+1. **Edit the schema:**
+   ```
+   backend/prisma/schema.prisma
    ```
 
-2. **Create migration:**
+2. **Create and apply the migration** (against dev branch only):
    ```bash
-   docker-compose exec backend npx prisma migrate dev --name describe_your_change
+   cd backend
+   npm exec prisma migrate dev --name describe_your_change
    ```
-   This generates a migration file and applies it to NeonDB.
+   This generates a migration file in `backend/prisma/migrations/` and applies it to the dev database.
 
 3. **Update seed script if needed:**
-   ```bash
-   # Edit backend/prisma/seed.js to match new schema
+   ```
+   backend/prisma/seed.js
    ```
 
-4. **Reseed database:**
+4. **Commit and push** — include both the schema change and the migration file:
    ```bash
-   ./seed.sh
+   git add backend/prisma/schema.prisma backend/prisma/migrations/
+   git commit -m "..."
+   git push
    ```
 
-### Production Deployment
+5. **Railway auto-deploys** — on startup, the backend runs `prisma migrate deploy`, which applies the new migration to production safely with no data loss.
+
+### Applying Migrations to Production Manually
+
+If you ever need to apply migrations to production outside of a Railway deploy:
 
 ```bash
-# Deploy migrations without prompts (safe for production)
-docker-compose exec backend npx prisma migrate deploy
+DATABASE_URL="<production-connection-string>" npm exec prisma migrate deploy
 ```
 
-### Clean Slate (DANGER - Deletes All Data)
+Never use `migrate dev` here — `migrate deploy` only applies pending migrations and never resets the database.
+
+### Seeding Production (One-time)
 
 ```bash
-# Reset database and apply all migrations
-docker-compose exec backend npx prisma migrate reset --force
+DATABASE_URL="<production-connection-string>" npm exec prisma db seed
 ```
+
+Only needed when bootstrapping a fresh production database. The seed script is idempotent (safe to run when data already exists).
+
+### Command Reference
+
+| Command | When to use |
+|---|---|
+| `prisma migrate dev` | Local only, against dev branch — creates migration files and applies them |
+| `prisma migrate deploy` | Production / CI — applies pending migrations, never resets |
+| `prisma db seed` | One-time data seeding, run manually |
+| `prisma studio` | GUI to inspect/edit the database |
 
 ### Key Reminders
 
-- **Never manually edit migration files** - always modify `schema.prisma` and generate new migrations
-- **Commit migration files** to version control alongside schema changes
-- **NeonDB is persistent** - it's in the cloud, not affected by Docker restarts
-- **Test migrations** on a development database before deploying to production
-- **Breaking changes** (renaming columns, changing types) may require data migration scripts
+- **Never run `migrate dev` against the production connection string** — it can reset the database and delete all data
+- **Always commit migration files** alongside schema changes — they are the source of truth for production
+- **NeonDB is persistent** — it is in the cloud, unaffected by Docker or Railway restarts
+- **Breaking changes** (renaming/dropping columns) require a data migration step — add it manually to the migration SQL file before deploying
 
 ## Project Structure
 

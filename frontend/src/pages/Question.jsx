@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getQuestion, answerQuestion } from '../api';
+import { getQuestion, answerQuestion, visitZone } from '../api';
 
 export default function Question({ refreshFriends }) {
     const { id } = useParams();
@@ -11,14 +11,23 @@ export default function Question({ refreshFriends }) {
     const [answer, setAnswer] = useState('');
     const [result, setResult] = useState(null);
     const [submitting, setSubmitting] = useState(false);
+    const [showZoneModal, setShowZoneModal] = useState(false);
 
     useEffect(() => {
         setLoading(true);
         getQuestion(id)
-            .then(setQuestion)
+            .then(q => {
+                setQuestion(q);
+                if (q.zone && !q.zoneVisited) setShowZoneModal(true);
+            })
             .catch(() => setError('Failed to load question'))
             .finally(() => setLoading(false));
     }, [id]);
+
+    const handleZoneDismiss = async () => {
+        setShowZoneModal(false);
+        try { await visitZone(question.zone.id); } catch { /* best-effort */ }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -45,7 +54,28 @@ export default function Question({ refreshFriends }) {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-background">
-            <div className="bg-white p-6 rounded shadow w-full max-w-md flex flex-col items-center">
+            {showZoneModal && question?.zone && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                <div className="bg-white rounded-xl shadow-lg w-full max-w-sm mx-4 p-6 flex flex-col items-center relative animate-zone-pop">
+                    <button
+                        className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl font-bold leading-none"
+                        onClick={handleZoneDismiss}
+                        aria-label="Close"
+                    >
+                        ×
+                    </button>
+                    <h2 className="text-lg font-bold text-brand mb-3">You've just found a new zone!</h2>
+                    <p className="text-center text-gray-800 mb-6">{question.zone.narrative}</p>
+                    <button
+                        className="bg-warning text-brand font-bold py-2 px-8 rounded-lg"
+                        onClick={handleZoneDismiss}
+                    >
+                        Let's do it!
+                    </button>
+                </div>
+            </div>
+        )}
+        <div className="bg-white p-6 rounded shadow w-full max-w-md flex flex-col items-center">
                 <h1 className="text-xl font-bold mb-4 text-brand">Question</h1>
                 <div className="mb-4 text-center font-semibold">{question.question}</div>
                 <form onSubmit={handleSubmit} className="w-full flex flex-col items-center gap-4">

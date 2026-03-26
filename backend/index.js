@@ -29,6 +29,9 @@ app.use('/questions', questionsRouter);
 const profileRouter = require('./routes/profile');
 app.use('/profile', profileRouter);
 
+const zonesRouter = require('./routes/zones');
+app.use('/zones', zonesRouter);
+
 const adminRouter = require('./routes/admin');
 app.use('/admin', adminRouter);
 
